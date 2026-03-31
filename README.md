@@ -9,10 +9,22 @@ O projeto permite:
 - Cadastro e login de usuarios.
 - Registro de receitas e despesas.
 - Organizacao por categorias (base e personalizadas).
-- Dashboard com saldo, distribuicao de gastos e indicadores.
+- Dashboard com saldo, distribuicao de gastos (pizza) e indicadores.
 - Relatorios por periodo (`ALL`, `Q1`, `Q2`, `Q3`, `Q4`) e ano.
 - Gestao de perfil (dados pessoais, preferencias, senha).
 - Exportacao dos dados do usuario em JSON.
+- Pagina Premium com comunicacao comercial e aviso de liberacao de funcionalidades.
+
+## Atualizacoes Recentes
+
+- Branding web atualizado: titulo da aba (`<title>`) agora exibe `CashTrack`.
+- Favicon customizado com monograma `CT` em `frontend/public/favicon.svg`.
+- Grafico de pizza do dashboard consolidando despesas a partir de todas as transacoes cadastradas, incluindo categorias personalizadas.
+- Tooltips do grafico de evolucao mensal ajustados para deixar explicito:
+  - Ganhos (verde)
+  - Gastos (vermelho)
+  - Barra azul = saldo positivo do mes (`ganhos - gastos`, quando > 0)
+- Nova pagina interna `premium`, acessivel pelos botoes "Ver planos" da lateral e do perfil.
 
 ## Arquitetura
 
@@ -249,4 +261,3 @@ A comunicacao com o backend e feita por `apiRequest()`, sempre com `credentials:
 ## Nota sobre Pastas Extras
 
 A pasta `ia_skills/` existe no workspace, mas nao faz parte da execucao direta do app `cashtrack` (frontend/backend) descrito neste README.
-
