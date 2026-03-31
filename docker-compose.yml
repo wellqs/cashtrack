@@ -1,0 +1,30 @@
+﻿services:
+  cashtrack-frontend:
+    container_name: cashtrack-frontend
+    build:
+      context: ./frontend
+      target: dev
+    ports:
+      - "5174:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_API_URL=http://localhost:3333
+    restart: unless-stopped
+
+  cashtrack-backend:
+    container_name: cashtrack-backend
+    build:
+      context: ./backend
+    ports:
+      - "3333:3333"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - PORT=3333
+      - JWT_SECRET=cashtrack-super-secret
+      - FRONTEND_ORIGIN=http://localhost:5174
+    restart: unless-stopped

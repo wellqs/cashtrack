@@ -1,0 +1,620 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0B1121;--surface:#141D2E;--surface2:#1C2740;--surface3:#243050;
+  --primary:#7C6FFF;--ps:rgba(124,111,255,0.15);--pb:rgba(124,111,255,0.3);
+  --green:#12C98C;--gs:rgba(18,201,140,0.13);
+  --red:#F4547A;--rs:rgba(244,84,122,0.13);
+  --amber:#FBBF24;--as2:rgba(251,191,36,0.13);
+  --text:#EEF2FF;--text2:#B8C4E0;--muted:#6B7FA8;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
+  --font:'Inter',sans-serif;--head:'Sora',sans-serif;
+  --r:14px;--rsm:10px;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);font-family:var(--font);color:var(--text);min-height:100vh;}
+
+/* screens */
+.screen{display:none;}
+.screen.on{display:block;}
+
+/* ── WELCOME ── */
+.wbg{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at top,#1a0e3b 0%,var(--bg) 55%);padding:24px;}
+.wi{width:100%;max-width:960px;}
+.whero{text-align:center;margin-bottom:40px;}
+.wbadge{display:inline-flex;align-items:center;gap:8px;background:var(--ps);border:1px solid var(--pb);border-radius:24px;padding:6px 16px;font-size:12px;color:#c4b9ff;margin-bottom:18px;}
+.wdot{width:7px;height:7px;background:var(--primary);border-radius:50%;}
+.wh1{font-family:var(--head);font-size:clamp(26px,4.5vw,50px);font-weight:700;color:var(--text);line-height:1.15;margin-bottom:14px;}
+.wh1 span{color:var(--primary);}
+.wp{font-size:15px;color:var(--text2);max-width:500px;margin:0 auto 28px;line-height:1.7;}
+.wbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn-p{background:var(--primary);color:#fff;border:none;border-radius:12px;padding:13px 30px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .18s;}
+.btn-p:hover{opacity:.88;}
+.btn-g{background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:12px;padding:13px 30px;font-family:var(--font);font-size:14px;cursor:pointer;transition:all .18s;}
+.btn-g:hover{border-color:var(--border2);color:var(--text);}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+.fcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;}
+.ficon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;}
+.fcard h4{font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px;}
+.fcard p{font-size:12px;color:var(--text2);line-height:1.6;}
+.tprem{font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;background:var(--as2);color:var(--amber);margin-left:5px;}
+
+/* ── ONBOARDING ── */
+.oshell{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px;}
+.ocard{width:100%;max-width:460px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:30px;}
+.sbar{display:flex;gap:6px;margin-bottom:26px;}
+.seg{height:4px;border-radius:2px;background:var(--surface3);flex:1;transition:background .3s;}
+.seg.done{background:var(--green);}
+.seg.act{background:var(--primary);}
+.otitle{font-family:var(--head);font-size:22px;font-weight:700;color:var(--text);margin-bottom:7px;}
+.osub{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:22px;}
+.gopt{display:flex;align-items:center;gap:13px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 15px;margin-bottom:9px;cursor:pointer;transition:all .18s;}
+.gopt:hover{border-color:var(--border2);}
+.gopt.sel{border-color:var(--primary);background:var(--ps);}
+.gemo{font-size:22px;width:34px;text-align:center;}
+.gtxt h4{font-size:13px;font-weight:500;color:var(--text);}
+.gtxt p{font-size:11px;color:var(--text2);margin-top:2px;}
+.gchk{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border2);margin-left:auto;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.gopt.sel .gchk{background:var(--primary);border-color:var(--primary);}
+.gchk-i{width:8px;height:8px;background:#fff;border-radius:50%;display:none;}
+.gopt.sel .gchk-i{display:block;}
+.trow{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:13px 14px;margin-bottom:9px;}
+.trtxt h4{font-size:13px;font-weight:500;color:var(--text);}
+.trtxt p{font-size:11px;color:var(--text2);margin-top:2px;}
+.tog{width:44px;height:26px;background:var(--surface3);border-radius:13px;position:relative;cursor:pointer;transition:background .22s;flex-shrink:0;border:1px solid var(--border2);}
+.tog.on{background:var(--primary);border-color:var(--primary);}
+.tog::after{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .22s;}
+.tog.on::after{transform:translateX(18px);}
+.finp{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .18s;margin-bottom:10px;}
+.finp:focus{border-color:var(--primary);}
+.finp::placeholder{color:var(--muted);}
+.flbl{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.catslbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:12px 0 8px;}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px;}
+.cchip{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:11px 6px;text-align:center;cursor:pointer;transition:all .18s;}
+.cchip.ec{border-color:rgba(244,84,122,.2);}
+.cchip.ec:hover{border-color:var(--red);background:var(--rs);}
+.cchip.ic{border-color:rgba(18,201,140,.2);}
+.cchip.ic:hover{border-color:var(--green);background:var(--gs);}
+.cemo{font-size:19px;display:block;margin-bottom:3px;}
+.cnm{font-size:11px;color:var(--text2);}
+.rbanner{background:linear-gradient(135deg,var(--ps),rgba(18,201,140,.08));border:1px solid var(--pb);border-radius:var(--r);padding:14px;text-align:center;margin-bottom:18px;}
+.rbanner p{font-size:13px;color:var(--text2);line-height:1.5;}
+.rbanner strong{color:var(--text);}
+.obtn{width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:var(--rsm);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;transition:opacity .18s;}
+.obtn:hover{opacity:.88;}
+
+/* ── APP ── */
+#screen-app{display:none;}
+#screen-app.on{display:flex;min-height:100dvh;height:100dvh;overflow:hidden;}
+
+/* sidebar */
+.sb{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width .27s;overflow:hidden;min-height:100dvh;height:100dvh;}
+.sb.col{width:64px;}
+.sblogo{display:flex;align-items:center;gap:11px;padding:18px 14px 15px;border-bottom:1px solid var(--border);white-space:nowrap;overflow:hidden;}
+.sbmark{width:34px;height:34px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),#a78bfa);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.sbword{font-family:var(--head);font-size:15px;font-weight:700;color:var(--text);transition:opacity .2s;}
+.sb.col .sbword{opacity:0;width:0;overflow:hidden;}
+.sbnav{flex:1;padding:10px 8px;overflow-y:auto;overflow-x:hidden;}
+.glbl{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;padding:9px 10px 3px;white-space:nowrap;transition:opacity .2s;}
+.sb.col .glbl{opacity:0;}
+.ni{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--rsm);cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;white-space:nowrap;transition:all .18s;margin-bottom:2px;border:1px solid transparent;}
+.ni svg{flex-shrink:0;opacity:.7;}
+.ni:hover{background:var(--surface2);color:var(--text);border-color:var(--border);}
+.ni.act{background:var(--ps);color:#c4b9ff;border-color:var(--pb);}
+.ni.act svg{opacity:1;color:#c4b9ff;}
+.nlbl{transition:opacity .2s,width .2s;overflow:hidden;}
+.sb.col .nlbl{opacity:0;width:0;}
+.nbadge{margin-left:auto;background:var(--primary);color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;flex-shrink:0;transition:opacity .2s;}
+.sb.col .nbadge{opacity:0;width:0;padding:0;overflow:hidden;}
+.sbfoot{padding:8px;border-top:1px solid var(--border);}
+.upgcard{background:linear-gradient(135deg,#3730a3,#6d28d9);border-radius:var(--rsm);padding:14px;overflow:hidden;transition:opacity .2s;}
+.sb.col .upgcard{opacity:0;pointer-events:none;}
+.upgcard-t{font-size:13px;font-weight:600;color:#e0d9ff;margin-bottom:3px;white-space:nowrap;}
+.upgcard-s{font-size:11px;color:rgba(224,217,255,.65);margin-bottom:9px;line-height:1.4;}
+.upgcard-b{background:#fff;color:#4f46e5;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;}
+
+/* main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative;min-height:100dvh;height:100dvh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 18px;height:58px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;gap:10px;}
+.tbl{display:flex;align-items:center;gap:10px;}
+.menbtn{width:35px;height:35px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);transition:all .18s;}
+.menbtn:hover{border-color:var(--border2);color:var(--text);}
+.ttitle{font-size:15px;font-weight:600;color:var(--text);}
+.tbr{display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.tsearch{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:7px 11px;color:var(--muted);font-size:12px;cursor:pointer;}
+.tdate{font-size:12px;color:var(--muted);}
+.tav{width:33px;height:33px;background:linear-gradient(135deg,var(--primary),#a78bfa);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;cursor:pointer;}
+
+/* content */
+.ca{flex:1;overflow-y:auto;padding:18px 18px 84px;}
+.ca::-webkit-scrollbar{width:4px;}
+.ca::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px;}
+.pg{display:none;}
+.pg.on{display:block;animation:fu .2s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+.clbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
+.cval{font-size:24px;font-weight:700;font-family:var(--head);font-variant-numeric:tabular-nums;color:var(--text);}
+.csub{font-size:12px;color:var(--muted);margin-top:4px;}
+
+/* balance hero */
+.bhero{background:linear-gradient(135deg,#14103a,#18192e);border:1px solid var(--pb);border-radius:var(--r);padding:20px 22px;margin-bottom:14px;position:relative;overflow:hidden;}
+.bhero::before{content:'';position:absolute;width:260px;height:260px;background:radial-gradient(circle,rgba(124,111,255,.18) 0%,transparent 70%);top:-70px;right:-50px;border-radius:50%;pointer-events:none;}
+.bperiod{font-size:12px;color:var(--muted);margin-bottom:4px;}
+.bmain{font-family:var(--head);font-size:36px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text);margin-bottom:18px;}
+.bmain .bc{font-size:18px;color:var(--text2);vertical-align:super;margin-right:2px;}
+.brow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.bmini{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:11px 13px;}
+.bmlbl{font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:5px;}
+.bmdg{width:6px;height:6px;border-radius:50%;}
+.bmv{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;}
+.bmv.g{color:var(--green);}
+.bmv.r{color:var(--red);}
+.bmv.p{color:#c4b9ff;}
+
+/* section header */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;margin-top:18px;}
+.st{font-size:14px;font-weight:600;color:var(--text);}
+.sl{font-size:12px;color:var(--primary);cursor:pointer;font-weight:500;}
+
+/* insight */
+.ic2{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:border-color .18s;}
+.ic2:hover{border-color:var(--border2);}
+.ii{font-size:20px;flex-shrink:0;}
+.ib .it{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.ib .is{font-size:12px;color:var(--text2);line-height:1.4;}
+
+/* cat bars */
+.cb{margin-bottom:12px;}
+.cbt{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.cbn{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;}
+.cba{font-size:12px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
+.bt{height:5px;background:var(--surface3);border-radius:3px;}
+.bf{height:100%;border-radius:3px;transition:width .55s ease;}
+
+/* tx */
+.txdg{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:12px 0 5px;}
+.txi{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.txi:last-child{border-bottom:none;}
+.txic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.txin{flex:1;min-width:0;}
+.txn{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.txm{font-size:11px;color:var(--muted);}
+.txa{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0;}
+.txa.i{color:var(--green);}
+.txa.e{color:var(--red);}
+
+/* chips */
+.chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px;margin-bottom:14px;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:5px 13px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .18s;}
+.chip:hover{border-color:var(--border2);color:var(--text);}
+.chip.on{background:var(--ps);border-color:var(--pb);color:#c4b9ff;}
+
+/* add form */
+.qwrap{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:17px;margin-bottom:13px;transition:border-color .2s;}
+.qwrap:focus-within{border-color:var(--primary);}
+.qlbl{font-size:11px;color:var(--muted);margin-bottom:7px;}
+.qlbl span{color:var(--primary);font-weight:600;}
+.qi{width:100%;background:transparent;border:none;outline:none;font-family:var(--head);font-size:28px;font-weight:700;color:var(--text);caret-color:var(--primary);}
+.qi::placeholder{color:var(--surface3);}
+.qhint{font-size:11px;color:var(--muted);margin-top:7px;}
+.typerow{display:flex;gap:8px;margin-bottom:13px;}
+.tbtn{flex:1;padding:11px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text2);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:all .18s;}
+.tbtn.ea{border-color:var(--red);background:var(--rs);color:var(--red);}
+.tbtn.ia{border-color:var(--green);background:var(--gs);color:var(--green);}
+.pcard{background:var(--surface);border:1px solid rgba(124,111,255,.25);border-radius:var(--r);padding:13px;margin-bottom:13px;}
+.plbl{font-size:11px;color:var(--primary);font-weight:600;margin-bottom:9px;}
+.pr{display:flex;justify-content:space-between;margin-bottom:6px;}
+.pk{font-size:12px;color:var(--muted);}
+.pv{font-size:12px;font-weight:600;color:var(--text);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px;}
+.fg .fl{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.fi{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 11px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .18s;}
+.fi:focus{border-color:var(--primary);}
+option{background:var(--surface2);}
+.bprim{width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:var(--rsm);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .18s;}
+.bprim:hover{opacity:.88;}
+.toast{background:var(--gs);border:1px solid rgba(18,201,140,.3);border-radius:var(--rsm);padding:11px;text-align:center;font-size:13px;color:var(--green);margin-top:11px;display:none;}
+
+/* reports */
+.dsec{display:flex;align-items:center;gap:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:13px;}
+.dleg .dli{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;color:var(--text2);}
+.dld{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.dlv{margin-left:auto;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
+.lcard{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:var(--r);padding:15px;display:flex;align-items:center;gap:11px;margin-bottom:13px;}
+.lcard-btn{margin-left:auto;background:var(--amber);color:#0B1121;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;}
+
+/* profile */
+.phead{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.pav{width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,var(--primary),#a78bfa);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0;}
+.pname{font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.pplan{font-size:12px;color:#c4b9ff;background:var(--ps);border:1px solid var(--pb);padding:3px 10px;border-radius:12px;display:inline-block;}
+.ssect{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 7px 2px;}
+.si{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:12px 15px;margin-bottom:5px;cursor:pointer;transition:border-color .18s;}
+.si:hover{border-color:var(--border2);}
+.sil{display:flex;align-items:center;gap:9px;}
+.sie{font-size:15px;width:20px;text-align:center;}
+.sit{font-size:13px;color:var(--text);}
+.sia{font-size:14px;color:var(--muted);}
+
+/* tab bar — always visible at bottom on small frames */
+.tabbar{display:flex;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;position:absolute;left:0;right:0;bottom:0;z-index:8;}
+.ti{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 10px;cursor:pointer;color:var(--muted);font-size:10px;font-weight:500;gap:4px;background:transparent;border:none;transition:color .18s;}
+.ti:hover{color:var(--text2);}
+.ti.on{color:#c4b9ff;}
+.tfab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px 4px 10px;cursor:pointer;}
+.fc{width:44px;height:44px;background:var(--primary);border-radius:13px;display:flex;align-items:center;justify-content:center;transition:transform .18s;}
+.fc:hover{transform:scale(1.07);}
+.tlbl{font-size:10px;color:var(--muted);margin-top:2px;font-weight:500;}
+
+/* responsive grid helpers */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;}
+@media(max-width:720px){.g2,.g3{grid-template-columns:1fr;} .dashgrid{grid-template-columns:1fr !important;}}
+@media(max-width:600px){.ca{padding:13px 13px 84px;} .tsearch{display:none;} .dsec{flex-direction:column;}}
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div class="screen on" id="sw">
+<div class="wbg"><div class="wi">
+  <div class="whero">
+    <div class="wbadge"><div class="wdot"></div>FinFlow — Gestão financeira pessoal</div>
+    <h1 class="wh1">Controle seu dinheiro<br>em <span>poucos segundos</span> por dia.</h1>
+    <p class="wp">Sem planilhas. Sem complicação. Registre gastos em 3 segundos e veja para onde vai cada centavo.</p>
+    <div class="wbtns">
+      <button class="btn-p" onclick="go('so')">Criar conta grátis</button>
+      <button class="btn-g" onclick="go('sa')">Já tenho conta</button>
+    </div>
+  </div>
+  <div class="fgrid">
+    <div class="fcard"><div class="ficon" style="background:var(--ps);">⚡</div><h4>Registro ultrarrápido</h4><p>Digite "50 almoço" e o sistema interpreta valor, categoria e descrição automaticamente.</p></div>
+    <div class="fcard"><div class="ficon" style="background:var(--gs);">📊</div><h4>Dashboard inteligente</h4><p>Saldo, categorias e tendências num relance. Informação clara, sem poluição visual.</p></div>
+    <div class="fcard"><div class="ficon" style="background:var(--as2);">💡</div><h4>Insights automáticos</h4><p>"Você gastou 20% mais com alimentação." Sem precisar procurar nada.</p></div>
+    <div class="fcard"><div class="ficon" style="background:var(--rs);">🎯</div><h4>Metas financeiras<span class="tprem">Premium</span></h4><p>Defina objetivos e acompanhe o progresso em tempo real com projeções automáticas.</p></div>
+  </div>
+</div></div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="screen" id="so">
+<div class="oshell"><div class="ocard">
+  <div class="sbar"><div class="seg act" id="sg1"></div><div class="seg" id="sg2"></div><div class="seg" id="sg3"></div></div>
+  <div class="otitle" id="ot">Qual é seu objetivo?</div>
+  <div class="osub" id="os">Escolha o que melhor descreve sua situação. Personalizamos a experiência para você.</div>
+
+  <div id="op1">
+    <div class="gopt sel" onclick="sg(this)"><div class="gemo">💰</div><div class="gtxt"><h4>Controlar meus gastos</h4><p>Quero saber para onde meu dinheiro vai</p></div><div class="gchk"><div class="gchk-i"></div></div></div>
+    <div class="gopt" onclick="sg(this)"><div class="gemo">🎯</div><div class="gtxt"><h4>Guardar dinheiro</h4><p>Quero criar uma reserva financeira</p></div><div class="gchk"><div class="gchk-i"></div></div></div>
+    <div class="gopt" onclick="sg(this)"><div class="gemo">💳</div><div class="gtxt"><h4>Sair das dívidas</h4><p>Quero organizar minhas contas</p></div><div class="gchk"><div class="gchk-i"></div></div></div>
+    <div class="gopt" onclick="sg(this)"><div class="gemo">📈</div><div class="gtxt"><h4>Investir melhor</h4><p>Quero entender meu potencial de investimento</p></div><div class="gchk"><div class="gchk-i"></div></div></div>
+    <div class="gopt" onclick="sg(this)"><div class="gemo">🏠</div><div class="gtxt"><h4>Realizar um sonho</h4><p>Casa própria, viagem, casamento…</p></div><div class="gchk"><div class="gchk-i"></div></div></div>
+  </div>
+
+  <div id="op2" style="display:none;">
+    <div class="flbl">Qual é seu nome?</div><input class="finp" placeholder="Ex: João Silva">
+    <div class="flbl">Renda mensal aproximada</div><input class="finp" placeholder="R$ 0,00" oninput="fc(this)">
+    <div class="flbl">Quanto quer guardar por mês?</div><input class="finp" placeholder="R$ 0,00" oninput="fc(this)">
+    <div class="trow"><div class="trtxt"><h4>Alertas de gastos excessivos</h4><p>Avise quando gastar mais de 70% da renda</p></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="trow"><div class="trtxt"><h4>Resumo semanal</h4><p>Receba um resumo toda segunda-feira</p></div><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+  </div>
+
+  <div id="op3" style="display:none;">
+    <div class="rbanner"><p><strong>✨ Tudo pronto para você!</strong><br>Já preparamos as categorias mais comuns. Personalize depois.</p></div>
+    <div class="catslbl">💸 Despesas</div>
+    <div class="cgrid">
+      <div class="cchip ec"><span class="cemo">🍔</span><span class="cnm">Alimentação</span></div>
+      <div class="cchip ec"><span class="cemo">🚗</span><span class="cnm">Transporte</span></div>
+      <div class="cchip ec"><span class="cemo">🏠</span><span class="cnm">Moradia</span></div>
+      <div class="cchip ec"><span class="cemo">💊</span><span class="cnm">Saúde</span></div>
+      <div class="cchip ec"><span class="cemo">📚</span><span class="cnm">Educação</span></div>
+      <div class="cchip ec"><span class="cemo">🎬</span><span class="cnm">Lazer</span></div>
+      <div class="cchip ec"><span class="cemo">👕</span><span class="cnm">Vestuário</span></div>
+      <div class="cchip ec"><span class="cemo">💻</span><span class="cnm">Tecnologia</span></div>
+      <div class="cchip ec"><span class="cemo">📱</span><span class="cnm">Assinaturas</span></div>
+    </div>
+    <div class="catslbl">💚 Receitas</div>
+    <div class="cgrid">
+      <div class="cchip ic"><span class="cemo">💼</span><span class="cnm">Salário</span></div>
+      <div class="cchip ic"><span class="cemo">🖥️</span><span class="cnm">Freelance</span></div>
+      <div class="cchip ic"><span class="cemo">📈</span><span class="cnm">Investimentos</span></div>
+      <div class="cchip ic"><span class="cemo">🎁</span><span class="cnm">Presente</span></div>
+      <div class="cchip ic"><span class="cemo">🏪</span><span class="cnm">Vendas</span></div>
+      <div class="cchip ic"><span class="cemo">➕</span><span class="cnm">Outros</span></div>
+    </div>
+  </div>
+  <button class="obtn" id="ob" onclick="ns()">Avançar →</button>
+</div></div>
+</div>
+
+<!-- APP -->
+<div class="screen" id="sa" style="flex-direction:row;">
+<div class="sb" id="sb">
+  <div class="sblogo"><div class="sbmark">💰</div><div class="sbword">FinFlow</div></div>
+  <nav class="sbnav">
+    <div class="glbl">Principal</div>
+    <div class="ni act" onclick="sp('dashboard',this)" id="nd"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="nlbl">Dashboard</span></div>
+    <div class="ni" onclick="sp('transactions',this)" id="nt"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><path d="M9 5a2 2 0 002 2h2a2 2 0 002-2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg><span class="nlbl">Transações</span><span class="nbadge">24</span></div>
+    <div class="ni" onclick="sp('add',this)" id="na"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span class="nlbl">Adicionar</span></div>
+    <div class="glbl">Análise</div>
+    <div class="ni" onclick="sp('reports',this)" id="nr"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nlbl">Relatórios</span></div>
+    <div class="glbl">Conta</div>
+    <div class="ni" onclick="sp('profile',this)" id="np"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="nlbl">Perfil</span></div>
+  </nav>
+  <div class="sbfoot"><div class="upgcard"><div class="upgcard-t">✨ Ir Premium</div><div class="upgcard-s">Metas, relatórios avançados e insights exclusivos.</div><button class="upgcard-b">Ver planos</button></div></div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="tbl">
+      <div class="menbtn" onclick="tsb()"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
+      <span class="ttitle" id="tt">Dashboard</span>
+    </div>
+    <div class="tbr">
+      <div class="tsearch"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar...</div>
+      <div class="tdate">Março 2025</div>
+      <div class="tav">JS</div>
+    </div>
+  </div>
+
+  <div class="ca">
+
+    <!-- DASHBOARD -->
+    <div class="pg on" id="pg-dashboard">
+      <div class="bhero">
+        <div class="bperiod">Saldo atual — Março 2025</div>
+        <div class="bmain"><span class="bc">R$</span>3.240,50</div>
+        <div class="brow">
+          <div class="bmini"><div class="bmlbl"><div class="bmdg" style="background:var(--green);"></div>Receitas</div><div class="bmv g">R$ 6.500,00</div></div>
+          <div class="bmini"><div class="bmlbl"><div class="bmdg" style="background:var(--red);"></div>Gastos</div><div class="bmv r">R$ 3.259,50</div></div>
+        </div>
+      </div>
+
+      <div class="sh"><div class="st">Insights do mês</div><div class="sl">Ver todos</div></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:9px;margin-bottom:4px;">
+        <div class="ic2"><div class="ii">🍔</div><div class="ib"><div class="it">Alimentação acima do normal</div><div class="is">Você gastou 24% mais que no mês passado.</div></div></div>
+        <div class="ic2"><div class="ii">✅</div><div class="ib"><div class="it">Boa economia!</div><div class="is">Você guardou R$ 3.240 — mais que em fevereiro.</div></div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:18px;" class="dashgrid">
+        <div>
+          <div class="sh" style="margin-top:0;"><div class="st">Gastos por categoria</div><div class="sl" onclick="sp('reports',document.getElementById('nr'))">Ver tudo</div></div>
+          <div class="card" style="padding:15px;">
+            <div class="cb"><div class="cbt"><div class="cbn"><span>🏠</span>Moradia</div><div class="cba">R$ 1.200</div></div><div class="bt"><div class="bf" style="width:92%;background:var(--primary);"></div></div></div>
+            <div class="cb"><div class="cbt"><div class="cbn"><span>🍔</span>Alimentação</div><div class="cba">R$ 980</div></div><div class="bt"><div class="bf" style="width:75%;background:var(--green);"></div></div></div>
+            <div class="cb"><div class="cbt"><div class="cbn"><span>🚗</span>Transporte</div><div class="cba">R$ 620</div></div><div class="bt"><div class="bf" style="width:48%;background:var(--amber);"></div></div></div>
+            <div class="cb"><div class="cbt"><div class="cbn"><span>🎬</span>Lazer</div><div class="cba">R$ 340</div></div><div class="bt"><div class="bf" style="width:26%;background:var(--red);"></div></div></div>
+            <div class="cb" style="margin-bottom:0;"><div class="cbt"><div class="cbn"><span>📱</span>Assinaturas</div><div class="cba">R$ 119</div></div><div class="bt"><div class="bf" style="width:9%;background:var(--muted);"></div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="sh" style="margin-top:0;"><div class="st">Últimas transações</div><div class="sl" onclick="sp('transactions',document.getElementById('nt'))">Ver todas</div></div>
+          <div class="card" style="padding:9px 13px;">
+            <div class="txi"><div class="txic" style="background:var(--gs);">💼</div><div class="txin"><div class="txn">Salário</div><div class="txm">Receita · 01/03</div></div><div class="txa i">+R$ 6.500</div></div>
+            <div class="txi"><div class="txic" style="background:var(--rs);">🏠</div><div class="txin"><div class="txn">Aluguel</div><div class="txm">Moradia · 02/03</div></div><div class="txa e">-R$ 1.200</div></div>
+            <div class="txi"><div class="txic" style="background:var(--rs);">🍔</div><div class="txin"><div class="txn">Restaurante</div><div class="txm">Alimentação · 03/03</div></div><div class="txa e">-R$ 47,90</div></div>
+            <div class="txi"><div class="txic" style="background:var(--ps);">🚗</div><div class="txin"><div class="txn">Uber</div><div class="txm">Transporte · 04/03</div></div><div class="txa e">-R$ 23,50</div></div>
+            <div class="txi" style="border:none;"><div class="txic" style="background:var(--as2);">🎬</div><div class="txin"><div class="txn">Cinema</div><div class="txm">Lazer · 05/03</div></div><div class="txa e">-R$ 68,00</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div class="pg" id="pg-transactions">
+      <div class="chips">
+        <div class="chip on">Todos</div><div class="chip">Despesas</div><div class="chip">Receitas</div>
+        <div class="chip">🍔 Alimentação</div><div class="chip">🚗 Transporte</div><div class="chip">🏠 Moradia</div>
+      </div>
+      <div class="card" style="padding:9px 15px;">
+        <div class="txdg">Março 2025</div>
+        <div class="txi"><div class="txic" style="background:var(--gs);">💼</div><div class="txin"><div class="txn">Salário</div><div class="txm">Receita · 01/03</div></div><div class="txa i">+R$ 6.500,00</div></div>
+        <div class="txi"><div class="txic" style="background:var(--rs);">🏠</div><div class="txin"><div class="txn">Aluguel</div><div class="txm">Moradia · 02/03</div></div><div class="txa e">-R$ 1.200,00</div></div>
+        <div class="txi"><div class="txic" style="background:var(--rs);">🍔</div><div class="txin"><div class="txn">Restaurante — almoço</div><div class="txm">Alimentação · 03/03</div></div><div class="txa e">-R$ 47,90</div></div>
+        <div class="txi"><div class="txic" style="background:var(--ps);">🚗</div><div class="txin"><div class="txn">Uber</div><div class="txm">Transporte · 04/03</div></div><div class="txa e">-R$ 23,50</div></div>
+        <div class="txi"><div class="txic" style="background:var(--as2);">🎬</div><div class="txin"><div class="txn">Cinema</div><div class="txm">Lazer · 05/03</div></div><div class="txa e">-R$ 68,00</div></div>
+        <div class="txi"><div class="txic" style="background:var(--rs);">🍔</div><div class="txin"><div class="txn">iFood</div><div class="txm">Alimentação · 06/03</div></div><div class="txa e">-R$ 54,80</div></div>
+        <div class="txi"><div class="txic" style="background:var(--ps);">📱</div><div class="txin"><div class="txn">Spotify + Netflix</div><div class="txm">Assinaturas · 07/03</div></div><div class="txa e">-R$ 72,90</div></div>
+        <div class="txi" style="border:none;"><div class="txic" style="background:var(--rs);">💊</div><div class="txin"><div class="txn">Farmácia</div><div class="txm">Saúde · 08/03</div></div><div class="txa e">-R$ 89,00</div></div>
+      </div>
+    </div>
+
+    <!-- ADD -->
+    <div class="pg" id="pg-add">
+      <div style="max-width:540px;">
+        <div class="typerow">
+          <button class="tbtn ea" id="be" onclick="stt('e')">💸 Despesa</button>
+          <button class="tbtn" id="bi" onclick="stt('i')">💰 Receita</button>
+        </div>
+        <div class="qwrap">
+          <div class="qlbl">⚡ Modo <span>rápido</span></div>
+          <input class="qi" id="qi" placeholder="50 almoço" oninput="pq(this.value)">
+          <div class="qhint">Digite valor + descrição · Ex: "38.50 gasolina" · "1200 aluguel"</div>
+        </div>
+        <div class="pcard" id="pc" style="display:none;">
+          <div class="plbl">✓ Interpretado automaticamente</div>
+          <div class="pr"><div class="pk">Valor</div><div class="pv" id="pval">—</div></div>
+          <div class="pr"><div class="pk">Descrição</div><div class="pv" id="pdesc">—</div></div>
+          <div class="pr" style="margin:0;"><div class="pk">Categoria</div><div class="pv" id="pcat">—</div></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><div class="fl">Data</div><input class="fi" type="date" value="2025-03-08"></div>
+          <div class="fg"><div class="fl">Categoria</div>
+            <select class="fi">
+              <option>🍔 Alimentação</option><option>🚗 Transporte</option><option>🏠 Moradia</option>
+              <option>🎬 Lazer</option><option>💊 Saúde</option><option>📱 Assinaturas</option>
+              <option>💼 Salário</option><option>🖥️ Freelance</option>
+            </select>
+          </div>
+        </div>
+        <button class="bprim" onclick="stx()">Salvar transação</button>
+        <div class="toast" id="toast">✓ Transação registrada com sucesso!</div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="pg" id="pg-reports">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px;">
+        <div style="width:31px;height:31px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);">‹</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text);">Março 2025</div>
+        <div style="width:31px;height:31px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);">›</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:11px;margin-bottom:14px;">
+        <div class="card" style="padding:14px;"><div class="clbl">Total gasto</div><div class="cval" style="color:var(--red);font-size:20px;">R$ 3.259,50</div><div class="csub">↑ 8,3% vs fevereiro</div></div>
+        <div class="card" style="padding:14px;"><div class="clbl">Total recebido</div><div class="cval" style="color:var(--green);font-size:20px;">R$ 6.500,00</div><div class="csub">= igual ao mês anterior</div></div>
+        <div class="card" style="padding:14px;"><div class="clbl">Economia</div><div class="cval" style="color:#c4b9ff;font-size:20px;">R$ 3.240,50</div><div class="csub">49,8% da renda guardada</div></div>
+      </div>
+      <div class="dsec">
+        <svg width="108" height="108" viewBox="0 0 108 108" style="flex-shrink:0;">
+          <circle cx="54" cy="54" r="38" fill="none" stroke="#1C2740" stroke-width="21"/>
+          <circle cx="54" cy="54" r="38" fill="none" stroke="#7C6FFF" stroke-width="21" stroke-dasharray="70 169" stroke-dashoffset="0" transform="rotate(-90 54 54)"/>
+          <circle cx="54" cy="54" r="38" fill="none" stroke="#12C98C" stroke-width="21" stroke-dasharray="41 198" stroke-dashoffset="-70" transform="rotate(-90 54 54)"/>
+          <circle cx="54" cy="54" r="38" fill="none" stroke="#FBBF24" stroke-width="21" stroke-dasharray="81 158" stroke-dashoffset="-111" transform="rotate(-90 54 54)"/>
+          <circle cx="54" cy="54" r="38" fill="none" stroke="#F4547A" stroke-width="21" stroke-dasharray="24 215" stroke-dashoffset="-192" transform="rotate(-90 54 54)"/>
+          <text x="54" y="49" text-anchor="middle" fill="#6B7FA8" font-size="9" font-family="Inter">Total</text>
+          <text x="54" y="63" text-anchor="middle" fill="#EEF2FF" font-size="10" font-weight="700" font-family="Inter">R$ 3.259</text>
+        </svg>
+        <div class="dleg" style="flex:1;">
+          <div class="dli"><div class="dld" style="background:#7C6FFF;"></div>Moradia<div class="dlv">37% · R$ 1.200</div></div>
+          <div class="dli"><div class="dld" style="background:#12C98C;"></div>Alimentação<div class="dlv">30% · R$ 980</div></div>
+          <div class="dli"><div class="dld" style="background:#FBBF24;"></div>Transporte<div class="dlv">19% · R$ 620</div></div>
+          <div class="dli" style="margin:0;"><div class="dld" style="background:#F4547A;"></div>Lazer<div class="dlv">10% · R$ 340</div></div>
+        </div>
+      </div>
+      <div class="lcard">
+        <div style="font-size:18px;">🔒</div>
+        <div><div style="font-size:13px;font-weight:500;color:var(--text);">Relatórios avançados</div><div style="font-size:11px;color:var(--text2);">Comparação entre meses e histórico anual no Premium.</div></div>
+        <button class="lcard-btn">Ver planos</button>
+      </div>
+      <div class="sh" style="margin-top:4px;"><div class="st">Insights do período</div></div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="ic2"><div class="ii">📈</div><div class="ib"><div class="it">Maior categoria: Moradia</div><div class="is">Representa 37% dos seus gastos do mês.</div></div></div>
+        <div class="ic2"><div class="ii">🍔</div><div class="ib"><div class="it">Alimentação +24%</div><div class="is">Gasto com comida aumentou vs mês anterior.</div></div></div>
+        <div class="ic2"><div class="ii">💡</div><div class="ib"><div class="it">Assinaturas estáveis</div><div class="is">Seus gastos com assinaturas se mantiveram.</div></div></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="pg" id="pg-profile">
+      <div class="phead">
+        <div class="pav">JS</div>
+        <div><div class="pname">João Silva</div><div class="pplan">Plano Gratuito</div></div>
+      </div>
+      <div style="background:linear-gradient(135deg,#3730a3,#6d28d9);border-radius:var(--r);padding:18px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:11px;">
+        <div><div style="font-size:14px;font-weight:700;color:#e0d9ff;margin-bottom:3px;">✨ Torne-se Premium</div><div style="font-size:12px;color:rgba(224,217,255,.7);">Metas, relatórios avançados e insights exclusivos.</div></div>
+        <button style="background:#fff;color:#4f46e5;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Ver planos</button>
+      </div>
+      <div class="ssect">Conta</div>
+      <div class="si"><div class="sil"><span class="sie">👤</span><span class="sit">Editar perfil</span></div><span class="sia">›</span></div>
+      <div class="si"><div class="sil"><span class="sie">🔔</span><span class="sit">Notificações</span></div><span class="sia">›</span></div>
+      <div class="si"><div class="sil"><span class="sie">🔐</span><span class="sit">Segurança</span></div><span class="sia">›</span></div>
+      <div class="ssect">Dados</div>
+      <div class="si"><div class="sil"><span class="sie">📤</span><span class="sit">Exportar dados <span class="tprem">Premium</span></span></div><span class="sia">›</span></div>
+      <div class="si"><div class="sil"><span class="sie">🗑️</span><span class="sit" style="color:var(--red);">Excluir conta</span></div><span class="sia">›</span></div>
+      <div class="ssect">Outros</div>
+      <div class="si"><div class="sil"><span class="sie">⭐</span><span class="sit">Avaliar o app</span></div><span class="sia">›</span></div>
+      <div class="si"><div class="sil"><span class="sie">🚪</span><span class="sit">Sair da conta</span></div><span class="sia">›</span></div>
+    </div>
+
+  </div><!-- /ca -->
+
+  <!-- TAB BAR -->
+  <div class="tabbar">
+    <button class="ti on" id="td" onclick="sp('dashboard',document.getElementById('nd'))">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      Início
+    </button>
+    <button class="ti" id="tt2" onclick="sp('transactions',document.getElementById('nt'))">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><path d="M9 5a2 2 0 002 2h2a2 2 0 002-2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
+      Transações
+    </button>
+    <div class="tfab" onclick="sp('add',document.getElementById('na'))">
+      <div class="fc"><svg width="21" height="21" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+      <div class="tlbl">Adicionar</div>
+    </div>
+    <button class="ti" id="tr" onclick="sp('reports',document.getElementById('nr'))">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Relatórios
+    </button>
+    <button class="ti" id="tp" onclick="sp('profile',document.getElementById('np'))">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Perfil
+    </button>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /screen-app -->
+
+<script>
+// screens
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('on');s.style.display='none';});
+  const el=document.getElementById(id);
+  if(id==='sa'){el.style.display='flex';setTimeout(()=>el.classList.add('on'),10);}
+  else{el.style.display='block';setTimeout(()=>el.classList.add('on'),10);}
+}
+
+// pages
+const ptitles={dashboard:'Dashboard',transactions:'Transações',add:'Adicionar',reports:'Relatórios',profile:'Perfil'};
+function sp(p,ni){
+  document.querySelectorAll('.pg').forEach(e=>e.classList.remove('on'));
+  const pg=document.getElementById('pg-'+p); if(pg) pg.classList.add('on');
+  document.querySelectorAll('.ni').forEach(e=>e.classList.remove('act'));
+  document.querySelectorAll('.ti').forEach(e=>e.classList.remove('on'));
+  if(ni) ni.classList.add('act');
+  const ti=document.getElementById({dashboard:'td',transactions:'tt2',reports:'tr',profile:'tp',add:null}[p]);
+  if(ti) ti.classList.add('on');
+  const el=document.getElementById('tt'); if(el) el.textContent=ptitles[p]||p;
+}
+
+// sidebar
+let sbo=true;
+function tsb(){sbo=!sbo;document.getElementById('sb').classList.toggle('col',!sbo);}
+
+// onboarding
+let step=1;
+function ns(){
+  if(step===1){
+    document.getElementById('sg1').className='seg done';
+    document.getElementById('sg2').className='seg act';
+    document.getElementById('op1').style.display='none';
+    document.getElementById('op2').style.display='block';
+    document.getElementById('ot').textContent='Monte seu perfil';
+    document.getElementById('os').textContent='Essas informações nos ajudam a dar insights mais precisos.';
+    step=2;
+  } else if(step===2){
+    document.getElementById('sg2').className='seg done';
+    document.getElementById('sg3').className='seg act';
+    document.getElementById('op2').style.display='none';
+    document.getElementById('op3').style.display='block';
+    document.getElementById('ot').textContent='Suas categorias';
+    document.getElementById('os').textContent='Já preparamos as mais comuns para você. Personalize depois.';
+    document.getElementById('ob').textContent='Começar agora ✓';
+    step=3;
+  } else { go('sa'); }
+}
+function sg(el){document.querySelectorAll('.gopt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');}
+function fc(el){let v=el.value.replace(/\D/g,'');if(!v){el.value='';return;}const n=parseInt(v)/100;el.value='R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+// parser
+const cm={almoço:'🍔 Alimentação',lanche:'🍔 Alimentação',jantar:'🍔 Alimentação',comida:'🍔 Alimentação',ifood:'🍔 Alimentação',restaurante:'🍔 Alimentação',uber:'🚗 Transporte',gasolina:'🚗 Transporte',onibus:'🚗 Transporte',metro:'🚗 Transporte',taxi:'🚗 Transporte',aluguel:'🏠 Moradia',condominio:'🏠 Moradia',luz:'🏠 Moradia',cinema:'🎬 Lazer',netflix:'📱 Assinaturas',spotify:'📱 Assinaturas',farmacia:'💊 Saúde',medico:'💊 Saúde',academia:'💊 Saúde',salario:'💼 Salário',freelance:'🖥️ Freelance'};
+function dc(d){const n=d.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');for(const k of Object.keys(cm))if(n.includes(k))return cm[k];return'📦 Outros';}
+function pq(v){const pc=document.getElementById('pc'),m=v.match(/[\d.,]+/);if(!m){pc.style.display='none';return;}const a=parseFloat(m[0].replace(',','.'));const de=v.replace(m[0],'').trim();if(!de){pc.style.display='none';return;}pc.style.display='block';document.getElementById('pval').textContent='R$ '+a.toFixed(2);document.getElementById('pdesc').textContent=de.charAt(0).toUpperCase()+de.slice(1);document.getElementById('pcat').textContent=dc(de);}
+function stt(t){document.getElementById('be').className='tbtn'+(t==='e'?' ea':'');document.getElementById('bi').className='tbtn'+(t==='i'?' ia':'');}
+function stx(){const t=document.getElementById('toast');t.style.display='block';document.getElementById('qi').value='';document.getElementById('pc').style.display='none';setTimeout(()=>t.style.display='none',2500);}
+
+document.querySelectorAll('.chip').forEach(c=>{c.addEventListener('click',()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');});});
+</script>
+</body>
+</html>

@@ -1,0 +1,413 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0B1121;--s1:#141D2E;--s2:#1C2740;--s3:#243050;
+  --p:#7C6FFF;--ps:rgba(124,111,255,.15);--pb:rgba(124,111,255,.3);
+  --g:#12C98C;--gs:rgba(18,201,140,.13);--gb:rgba(18,201,140,.3);
+  --r:#F4547A;--rs:rgba(244,84,122,.13);--rb:rgba(244,84,122,.3);
+  --a:#FBBF24;--as2:rgba(251,191,36,.13);
+  --t:#EEF2FF;--t2:#B8C4E0;--mu:#6B7FA8;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.14);
+  --font:'Inter',sans-serif;--head:'Sora',sans-serif;
+  --r14:14px;--r10:10px;
+}
+body{
+  background:var(--bg);
+  font-family:var(--font);
+  color:var(--t);
+  min-height:100vh;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:32px 20px 40px;
+}
+
+.page-wrap{
+  width:100%;
+  max-width:680px;
+}
+
+/* tipo toggle */
+.type-toggle{
+  display:grid;grid-template-columns:1fr 1fr;
+  background:var(--s2);border:1px solid var(--bd);
+  border-radius:12px;padding:4px;gap:4px;
+  margin-bottom:20px;
+}
+.tt-btn{
+  padding:11px;border:none;border-radius:9px;
+  font-family:var(--font);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .2s;color:var(--mu);background:transparent;
+}
+.tt-btn.exp{color:var(--r);}
+.tt-btn.inc{color:var(--g);}
+.tt-btn.exp-on{background:var(--rs);border:1px solid var(--rb);color:var(--r);}
+.tt-btn.inc-on{background:var(--gs);border:1px solid var(--gb);color:var(--g);}
+
+/* quick input */
+.quick-card{
+  background:var(--s1);
+  border:1.5px solid var(--bd);
+  border-radius:var(--r14);
+  padding:20px 22px;
+  margin-bottom:16px;
+  transition:border-color .2s;
+  cursor:text;
+}
+.quick-card:focus-within{border-color:var(--p);}
+.quick-lbl{font-size:11px;color:var(--mu);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.quick-lbl b{color:var(--p);font-weight:600;}
+.quick-input{
+  width:100%;background:transparent;border:none;outline:none;
+  font-family:var(--head);font-size:32px;font-weight:700;
+  color:var(--t);caret-color:var(--p);
+}
+.quick-input::placeholder{color:var(--s3);}
+.quick-hint{font-size:11px;color:var(--mu);margin-top:8px;display:flex;align-items:center;gap:5px;}
+.quick-hint span{color:var(--p);}
+
+/* parsed preview */
+.parsed{
+  background:linear-gradient(135deg,rgba(124,111,255,.08),rgba(18,201,140,.05));
+  border:1px solid var(--pb);
+  border-radius:var(--r10);
+  padding:12px 14px;
+  margin-bottom:16px;
+  display:none;
+}
+.parsed-lbl{font-size:10px;font-weight:600;color:var(--p);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.parsed-pills{display:flex;gap:8px;flex-wrap:wrap;}
+.pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--s2);border:1px solid var(--bd2);
+  border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;
+}
+.pill-key{color:var(--mu);margin-right:2px;}
+.pill-val{color:var(--t);}
+
+/* divider */
+.divider{
+  display:flex;align-items:center;gap:10px;
+  margin:4px 0 16px;color:var(--mu);font-size:11px;
+}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--bd);}
+
+/* form grid */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr;}
+@media(max-width:500px){.form-grid,.form-grid.three{grid-template-columns:1fr;}}
+
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg.full{grid-column:1/-1;}
+.fl{font-size:11px;color:var(--mu);font-weight:500;}
+.fi{
+  background:var(--s2);border:1px solid var(--bd);
+  border-radius:var(--r10);padding:11px 13px;
+  color:var(--t);font-family:var(--font);font-size:13px;
+  outline:none;transition:border-color .2s;width:100%;
+}
+.fi:focus{border-color:var(--p);}
+.fi::placeholder{color:var(--mu);}
+option{background:var(--s2);color:var(--t);}
+
+/* recorrência chips */
+.recur-row{display:flex;gap:7px;flex-wrap:wrap;}
+.recur-chip{
+  padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;
+  background:var(--s2);border:1px solid var(--bd);color:var(--t2);
+  cursor:pointer;transition:all .18s;
+}
+.recur-chip:hover{border-color:var(--bd2);color:var(--t);}
+.recur-chip.on{background:var(--ps);border-color:var(--pb);color:#c4b9ff;}
+
+/* nota */
+.nota-wrap{position:relative;}
+.nota-count{position:absolute;bottom:8px;right:10px;font-size:10px;color:var(--mu);}
+
+/* toggle switch row */
+.switch-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--s2);border:1px solid var(--bd);
+  border-radius:var(--r10);padding:12px 14px;
+}
+.sr-text h4{font-size:13px;font-weight:500;color:var(--t);}
+.sr-text p{font-size:11px;color:var(--mu);margin-top:2px;}
+.sw{width:42px;height:24px;background:var(--s3);border-radius:12px;
+  position:relative;cursor:pointer;transition:background .22s;flex-shrink:0;border:1px solid var(--bd2);}
+.sw.on{background:var(--p);border-color:var(--p);}
+.sw::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .22s;}
+.sw.on::after{transform:translateX(18px);}
+
+/* save button */
+.save-btn{
+  width:100%;padding:15px;
+  background:var(--p);color:#fff;border:none;
+  border-radius:var(--r10);font-family:var(--font);
+  font-size:15px;font-weight:600;cursor:pointer;
+  transition:opacity .18s,transform .1s;
+  margin-top:8px;
+}
+.save-btn.exp-mode{background:var(--r);}
+.save-btn.inc-mode{background:var(--g);}
+.save-btn:hover{opacity:.88;}
+.save-btn:active{transform:scale(.98);}
+
+/* recent quick adds */
+.recent-title{font-size:12px;font-weight:600;color:var(--mu);margin-bottom:10px;text-transform:uppercase;letter-spacing:.07em;}
+.recent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;}
+.recent-chip{
+  background:var(--s2);border:1px solid var(--bd);border-radius:var(--r10);
+  padding:10px 12px;cursor:pointer;transition:all .18s;
+}
+.recent-chip:hover{border-color:var(--bd2);background:var(--s3);}
+.rc-icon{font-size:16px;margin-bottom:4px;}
+.rc-name{font-size:11px;color:var(--t2);margin-bottom:2px;}
+.rc-val{font-size:12px;font-weight:600;color:var(--t);font-variant-numeric:tabular-nums;}
+
+/* toast */
+.toast{
+  background:var(--gs);border:1px solid var(--gb);
+  border-radius:var(--r10);padding:14px 16px;
+  text-align:center;font-size:13px;color:var(--g);
+  font-weight:500;margin-top:12px;display:none;
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- TYPE TOGGLE -->
+  <div class="type-toggle">
+    <button class="tt-btn exp-on" id="btn-exp" onclick="setType('exp')">💸 Despesa</button>
+    <button class="tt-btn inc" id="btn-inc" onclick="setType('inc')">💰 Receita</button>
+  </div>
+
+  <!-- QUICK INPUT -->
+  <div class="quick-card">
+    <div class="quick-lbl">⚡ <b>Modo rápido</b></div>
+    <input class="quick-input" id="qi" placeholder="50 almoço" oninput="parseQ(this.value)" autocomplete="off">
+    <div class="quick-hint">Digite valor + descrição · Ex: <span>"38.50 gasolina"</span> · <span>"1200 aluguel"</span></div>
+  </div>
+
+  <!-- PARSED PREVIEW -->
+  <div class="parsed" id="parsed">
+    <div class="parsed-lbl">✓ Interpretado automaticamente</div>
+    <div class="parsed-pills" id="pills"></div>
+  </div>
+
+  <div class="divider">ou preencha manualmente</div>
+
+  <!-- VALOR + DESCRIÇÃO -->
+  <div class="form-grid" style="margin-bottom:12px;">
+    <div class="fg">
+      <div class="fl">Valor (R$)</div>
+      <input class="fi" id="fi-val" placeholder="0,00" oninput="fmtVal(this)">
+    </div>
+    <div class="fg">
+      <div class="fl">Descrição</div>
+      <input class="fi" id="fi-desc" placeholder="Ex: almoço, uber, aluguel…">
+    </div>
+  </div>
+
+  <!-- DATA + CATEGORIA + CONTA -->
+  <div class="form-grid three" style="margin-bottom:12px;">
+    <div class="fg">
+      <div class="fl">Data</div>
+      <input class="fi" type="date" value="2025-03-08">
+    </div>
+    <div class="fg">
+      <div class="fl">Categoria</div>
+      <select class="fi" id="fi-cat">
+        <option>🍔 Alimentação</option>
+        <option>🚗 Transporte</option>
+        <option>🏠 Moradia</option>
+        <option>🎬 Lazer</option>
+        <option>💊 Saúde</option>
+        <option>📚 Educação</option>
+        <option>📱 Assinaturas</option>
+        <option>👕 Vestuário</option>
+        <option>💼 Salário</option>
+        <option>🖥️ Freelance</option>
+        <option>📦 Outros</option>
+      </select>
+    </div>
+    <div class="fg">
+      <div class="fl">Conta</div>
+      <select class="fi">
+        <option>🏦 Conta corrente</option>
+        <option>💳 Cartão de crédito</option>
+        <option>💵 Dinheiro</option>
+        <option>📲 Pix</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- RECORRÊNCIA -->
+  <div class="fg" style="margin-bottom:12px;">
+    <div class="fl">Recorrência</div>
+    <div class="recur-row" id="recur-row">
+      <div class="recur-chip on" onclick="selRecur(this)">Única</div>
+      <div class="recur-chip" onclick="selRecur(this)">Semanal</div>
+      <div class="recur-chip" onclick="selRecur(this)">Quinzenal</div>
+      <div class="recur-chip" onclick="selRecur(this)">Mensal</div>
+      <div class="recur-chip" onclick="selRecur(this)">Anual</div>
+    </div>
+  </div>
+
+  <!-- NOTA -->
+  <div class="fg" style="margin-bottom:12px;">
+    <div class="fl">Nota (opcional)</div>
+    <div class="nota-wrap">
+      <textarea class="fi" id="nota" placeholder="Adicione um lembrete ou detalhe sobre esta transação…" rows="3" style="resize:none;line-height:1.5;" oninput="countNota(this)"></textarea>
+      <div class="nota-count" id="nota-count">0/120</div>
+    </div>
+  </div>
+
+  <!-- NOTIFICAR -->
+  <div class="switch-row" style="margin-bottom:20px;">
+    <div class="sr-text">
+      <h4>Notificar quando lançado</h4>
+      <p>Receber confirmação por notificação push</p>
+    </div>
+    <div class="sw" onclick="this.classList.toggle('on')"></div>
+  </div>
+
+  <!-- SAVE BUTTON -->
+  <button class="save-btn exp-mode" id="save-btn" onclick="saveTx()">Salvar despesa</button>
+  <div class="toast" id="toast">✓ Transação registrada com sucesso!</div>
+
+  <!-- RECENT QUICK ADDS -->
+  <div style="margin-top:28px;">
+    <div class="recent-title">Lançamentos rápidos frequentes</div>
+    <div class="recent-grid">
+      <div class="recent-chip" onclick="fillQuick('47.90 almoço')">
+        <div class="rc-icon">🍔</div>
+        <div class="rc-name">Almoço</div>
+        <div class="rc-val">R$ 47,90</div>
+      </div>
+      <div class="recent-chip" onclick="fillQuick('23.50 uber')">
+        <div class="rc-icon">🚗</div>
+        <div class="rc-name">Uber</div>
+        <div class="rc-val">R$ 23,50</div>
+      </div>
+      <div class="recent-chip" onclick="fillQuick('1200 aluguel')">
+        <div class="rc-icon">🏠</div>
+        <div class="rc-name">Aluguel</div>
+        <div class="rc-val">R$ 1.200,00</div>
+      </div>
+      <div class="recent-chip" onclick="fillQuick('72.90 spotify netflix')">
+        <div class="rc-icon">📱</div>
+        <div class="rc-name">Assinaturas</div>
+        <div class="rc-val">R$ 72,90</div>
+      </div>
+      <div class="recent-chip" onclick="fillQuick('68 cinema')">
+        <div class="rc-icon">🎬</div>
+        <div class="rc-name">Cinema</div>
+        <div class="rc-val">R$ 68,00</div>
+      </div>
+      <div class="recent-chip" onclick="fillQuick('89 farmacia')">
+        <div class="rc-icon">💊</div>
+        <div class="rc-name">Farmácia</div>
+        <div class="rc-val">R$ 89,00</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const cats={
+  almoço:'🍔 Alimentação',lanche:'🍔 Alimentação',jantar:'🍔 Alimentação',
+  comida:'🍔 Alimentação',ifood:'🍔 Alimentação',restaurante:'🍔 Alimentação',
+  pizza:'🍔 Alimentação',cafe:'🍔 Alimentação',
+  uber:'🚗 Transporte',gasolina:'🚗 Transporte',onibus:'🚗 Transporte',
+  metro:'🚗 Transporte',taxi:'🚗 Transporte',combustivel:'🚗 Transporte',
+  aluguel:'🏠 Moradia',condominio:'🏠 Moradia',luz:'🏠 Moradia',agua:'🏠 Moradia',
+  cinema:'🎬 Lazer',show:'🎬 Lazer',teatro:'🎬 Lazer',
+  netflix:'📱 Assinaturas',spotify:'📱 Assinaturas',assinatura:'📱 Assinaturas',
+  farmacia:'💊 Saúde',medico:'💊 Saúde',academia:'💊 Saúde',remedio:'💊 Saúde',
+  salario:'💼 Salário',freelance:'🖥️ Freelance',
+};
+function detectCat(d){
+  const n=d.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  for(const k of Object.keys(cats)) if(n.includes(k)) return cats[k];
+  return '📦 Outros';
+}
+
+function parseQ(v){
+  const parsed=document.getElementById('parsed');
+  const m=v.match(/[\d.,]+/);
+  if(!m){parsed.style.display='none';return;}
+  const amt=parseFloat(m[0].replace(',','.'));
+  const desc=v.replace(m[0],'').trim();
+  if(!desc){parsed.style.display='none';return;}
+  const cat=detectCat(desc);
+  parsed.style.display='block';
+  document.getElementById('pills').innerHTML=`
+    <div class="pill"><span class="pill-key">Valor</span><span class="pill-val">R$ ${amt.toFixed(2)}</span></div>
+    <div class="pill"><span class="pill-key">Descrição</span><span class="pill-val">${desc.charAt(0).toUpperCase()+desc.slice(1)}</span></div>
+    <div class="pill"><span class="pill-key">Categoria</span><span class="pill-val">${cat}</span></div>
+  `;
+  // auto-fill fields
+  document.getElementById('fi-val').value='R$ '+amt.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('fi-desc').value=desc.charAt(0).toUpperCase()+desc.slice(1);
+  const sel=document.getElementById('fi-cat');
+  for(let i=0;i<sel.options.length;i++) if(sel.options[i].text===cat){sel.selectedIndex=i;break;}
+}
+
+function fillQuick(txt){
+  const qi=document.getElementById('qi');
+  qi.value=txt;
+  parseQ(txt);
+  qi.focus();
+}
+
+function fmtVal(el){
+  let v=el.value.replace(/\D/g,'');
+  if(!v){el.value='';return;}
+  const n=parseInt(v)/100;
+  el.value='R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function selRecur(el){
+  document.querySelectorAll('.recur-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function countNota(el){
+  const max=120;
+  const len=el.value.length;
+  if(len>max) el.value=el.value.slice(0,max);
+  document.getElementById('nota-count').textContent=Math.min(len,max)+'/'+max;
+}
+
+let currentType='exp';
+function setType(t){
+  currentType=t;
+  document.getElementById('btn-exp').className='tt-btn '+(t==='exp'?'exp-on':'exp');
+  document.getElementById('btn-inc').className='tt-btn '+(t==='inc'?'inc-on':'inc');
+  const btn=document.getElementById('save-btn');
+  btn.className='save-btn '+(t==='exp'?'exp-mode':'inc-mode');
+  btn.textContent=t==='exp'?'Salvar despesa':'Salvar receita';
+}
+
+function saveTx(){
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  document.getElementById('qi').value='';
+  document.getElementById('fi-val').value='';
+  document.getElementById('fi-desc').value='';
+  document.getElementById('nota').value='';
+  document.getElementById('nota-count').textContent='0/120';
+  document.getElementById('parsed').style.display='none';
+  setTimeout(()=>t.style.display='none',2500);
+}
+</script>
+</body>
+</html>

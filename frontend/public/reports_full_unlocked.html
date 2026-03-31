@@ -1,0 +1,534 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0B1121;--s1:#141D2E;--s2:#1C2740;--s3:#243050;
+  --p:#7C6FFF;--ps:rgba(124,111,255,.15);--pb:rgba(124,111,255,.3);
+  --g:#12C98C;--gs:rgba(18,201,140,.13);--gb:rgba(18,201,140,.3);
+  --r:#F4547A;--rs:rgba(244,84,122,.13);--rb:rgba(244,84,122,.3);
+  --a:#FBBF24;--as2:rgba(251,191,36,.13);
+  --t:#EEF2FF;--t2:#B8C4E0;--mu:#6B7FA8;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.14);
+  --font:'Inter',sans-serif;--head:'Sora',sans-serif;
+  --r14:14px;--r10:10px;
+}
+body{background:var(--bg);font-family:var(--font);color:var(--t);padding:20px 20px 48px;}
+
+/* TOP BAR */
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.top-left{display:flex;align-items:center;gap:10px;}
+.page-title{font-family:var(--head);font-size:20px;font-weight:700;}
+.year-nav{display:flex;align-items:center;gap:6px;}
+.yn-btn{width:30px;height:30px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;cursor:pointer;color:var(--t2);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.yn-btn:hover{border-color:var(--bd2);color:var(--t);}
+.yn-lbl{font-size:14px;font-weight:600;min-width:40px;text-align:center;}
+.badge-free{background:var(--gs);border:1px solid var(--gb);color:var(--g);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;}
+.top-right{display:flex;gap:8px;flex-wrap:wrap;}
+.btn-export{display:flex;align-items:center;gap:7px;background:var(--g);border:none;border-radius:var(--r10);padding:10px 18px;color:#0B1121;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:opacity .18s;}
+.btn-export:hover{opacity:.88;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+@media(max-width:680px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+.kpi{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r14);padding:16px;}
+.kpi-lbl{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.kpi-val{font-size:21px;font-weight:700;font-family:var(--head);font-variant-numeric:tabular-nums;}
+.kpi-val.g{color:var(--g);}
+.kpi-val.r{color:var(--r);}
+.kpi-val.p{color:#c4b9ff;}
+.kpi-val.a{color:var(--a);}
+.kpi-sub{font-size:11px;color:var(--mu);margin-top:5px;}
+.kpi-sub.up{color:var(--r);}
+.kpi-sub.dn{color:var(--g);}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px;align-items:center;}
+.flbl{font-size:11px;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+.fchip{background:var(--s2);border:1px solid var(--bd);color:var(--t2);padding:6px 13px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.fchip:hover{border-color:var(--bd2);color:var(--t);}
+.fchip.on{background:var(--ps);border-color:var(--pb);color:#c4b9ff;}
+
+/* CARD */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r14);padding:20px;margin-bottom:16px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.card-title{font-size:14px;font-weight:600;color:var(--t);}
+.card-sub{font-size:12px;color:var(--mu);margin-top:2px;}
+.leg-row{display:flex;gap:14px;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);}
+.leg-dot{width:10px;height:10px;border-radius:50%;}
+
+/* DONUT */
+.donut-wrap{display:grid;grid-template-columns:160px 1fr;gap:20px;align-items:start;}
+@media(max-width:480px){.donut-wrap{grid-template-columns:1fr;}}
+.donut-c{position:relative;width:160px;height:160px;}
+.donut-mid{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;}
+.dm-val{font-family:var(--head);font-size:15px;font-weight:700;}
+.dm-lbl{font-size:10px;color:var(--mu);}
+.cat-list{}
+.cat-row{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd);}
+.cat-row:last-child{border:none;}
+.cat-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.cat-name{font-size:12px;color:var(--t2);flex:1;}
+.cat-track{width:70px;height:5px;background:var(--s3);border-radius:3px;}
+.cat-fill{height:100%;border-radius:3px;}
+.cat-pct{font-size:11px;color:var(--mu);min-width:30px;text-align:right;}
+.cat-amt{font-size:12px;font-weight:600;color:var(--t);font-variant-numeric:tabular-nums;min-width:72px;text-align:right;}
+
+/* MONTH TABS */
+.mtabs{display:flex;gap:5px;flex-wrap:wrap;}
+.mtab{background:var(--s2);border:1px solid var(--bd);color:var(--mu);padding:5px 11px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;transition:all .18s;}
+.mtab:hover{color:var(--t2);}
+.mtab.on{background:var(--ps);border-color:var(--pb);color:#c4b9ff;}
+
+/* COMPARE GRID */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;}
+.comp-card{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r10);padding:14px;}
+.comp-card-title{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.comp-delta{font-size:11px;font-weight:700;padding:2px 7px;border-radius:8px;}
+.comp-delta.up{background:var(--rs);color:var(--r);}
+.comp-delta.dn{background:var(--gs);color:var(--g);}
+.comp-delta.neu{background:var(--s3);color:var(--mu);}
+.comp-bar-row{margin-bottom:7px;}
+.comp-bar-label{display:flex;justify-content:space-between;margin-bottom:3px;}
+.comp-bar-name{font-size:10px;color:var(--mu);}
+.comp-bar-val{font-size:10px;color:var(--t);font-variant-numeric:tabular-nums;}
+.comp-track{height:5px;background:var(--s3);border-radius:3px;}
+.comp-fill{height:100%;border-radius:3px;}
+
+/* METAS */
+.meta-list{}
+.meta-item{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r10);padding:14px 16px;margin-bottom:10px;}
+.meta-item:last-child{margin-bottom:0;}
+.meta-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.meta-name{font-size:13px;font-weight:500;color:var(--t);}
+.meta-vals{font-size:12px;color:var(--mu);font-variant-numeric:tabular-nums;}
+.meta-track{height:8px;background:var(--s3);border-radius:4px;overflow:hidden;margin-bottom:5px;}
+.meta-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.meta-footer{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);}
+.meta-footer span{color:var(--t2);}
+
+/* PROJECAO */
+.proj-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;}
+.proj-card{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r10);padding:14px;}
+.proj-emoji{font-size:20px;margin-bottom:8px;}
+.proj-title{font-size:12px;color:var(--t2);margin-bottom:4px;}
+.proj-val{font-size:16px;font-weight:700;font-family:var(--head);font-variant-numeric:tabular-nums;margin-bottom:4px;}
+.proj-hint{font-size:11px;color:var(--mu);line-height:1.4;}
+
+/* INSIGHTS */
+.ins-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:16px;}
+.ins-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r14);padding:14px 16px;display:flex;align-items:flex-start;gap:11px;}
+.ins-ico{font-size:20px;flex-shrink:0;}
+.ins-t{font-size:13px;font-weight:500;color:var(--t);margin-bottom:2px;}
+.ins-s{font-size:12px;color:var(--t2);line-height:1.5;}
+
+/* SECTION TITLE */
+.sec-title{font-size:13px;font-weight:600;color:var(--t);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd);}
+
+/* EXPORT MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;align-items:center;justify-content:center;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:20px;padding:28px;width:90%;max-width:400px;}
+.modal-title{font-family:var(--head);font-size:18px;font-weight:700;margin-bottom:5px;}
+.modal-sub{font-size:12px;color:var(--t2);margin-bottom:20px;line-height:1.5;}
+.mopt{display:flex;align-items:center;gap:13px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r10);padding:13px 14px;margin-bottom:9px;cursor:pointer;transition:all .2s;}
+.mopt:hover{border-color:var(--pb);background:var(--ps);}
+.mopt-ico{font-size:22px;}
+.mopt-text h4{font-size:13px;font-weight:500;color:var(--t);}
+.mopt-text p{font-size:11px;color:var(--mu);}
+.mopt-check{margin-left:auto;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--bd2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.mopt:hover .mopt-check{background:var(--p);border-color:var(--p);}
+.mopt:hover .mopt-check::after{content:'✓';font-size:10px;color:#fff;}
+.mclose{width:100%;padding:12px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r10);color:var(--t2);font-family:var(--font);font-size:13px;cursor:pointer;margin-top:4px;transition:all .18s;}
+.mclose:hover{border-color:var(--bd2);color:var(--t);}
+.toast-exp{display:none;background:var(--gs);border:1px solid var(--gb);border-radius:var(--r10);padding:12px 16px;text-align:center;font-size:13px;color:var(--g);font-weight:500;margin-top:12px;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-left">
+    <div class="page-title">Relatórios</div>
+    <div class="year-nav">
+      <div class="yn-btn" onclick="changeYear(-1)">‹</div>
+      <div class="yn-lbl" id="yr">2025</div>
+      <div class="yn-btn" onclick="changeYear(1)">›</div>
+    </div>
+    <div class="badge-free">✓ Tudo desbloqueado</div>
+  </div>
+  <div class="top-right">
+    <button class="btn-export" onclick="openModal()">📄 Exportar relatório</button>
+  </div>
+</div>
+
+<!-- KPI -->
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-lbl">Total recebido</div><div class="kpi-val g" id="k-rec">—</div><div class="kpi-sub" id="k-rec-s">Período</div></div>
+  <div class="kpi"><div class="kpi-lbl">Total gasto</div><div class="kpi-val r" id="k-gas">—</div><div class="kpi-sub up" id="k-gas-s">—</div></div>
+  <div class="kpi"><div class="kpi-lbl">Economia</div><div class="kpi-val p" id="k-eco">—</div><div class="kpi-sub dn" id="k-eco-s">—</div></div>
+  <div class="kpi"><div class="kpi-lbl">Maior gasto único</div><div class="kpi-val a">R$ 1.200</div><div class="kpi-sub">Aluguel — Mar/25</div></div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <span class="flbl">Período:</span>
+  <div class="fchip on" onclick="setFilter(this,'Q1')">T1 Jan–Mar</div>
+  <div class="fchip" onclick="setFilter(this,'Q2')">T2 Abr–Jun</div>
+  <div class="fchip" onclick="setFilter(this,'Q3')">T3 Jul–Set</div>
+  <div class="fchip" onclick="setFilter(this,'Q4')">T4 Out–Dez</div>
+  <div class="fchip" onclick="setFilter(this,'ALL')">Ano completo</div>
+</div>
+
+<!-- BAR CHART -->
+<div class="card">
+  <div class="card-header">
+    <div><div class="card-title">Receitas vs Despesas</div><div class="card-sub" id="bar-sub">Janeiro a Março · 2025</div></div>
+    <div class="leg-row">
+      <div class="leg"><div class="leg-dot" style="background:var(--g);"></div>Receitas</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--r);"></div>Despesas</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--p);"></div>Economia</div>
+    </div>
+  </div>
+  <div style="position:relative;height:220px;"><canvas id="barChart"></canvas></div>
+</div>
+
+<!-- INSIGHTS -->
+<div class="ins-grid">
+  <div class="ins-card"><div class="ins-ico">📈</div><div><div class="ins-t">Melhor mês do período</div><div class="ins-s">Janeiro — R$ 10.160 guardados (79% da renda).</div></div></div>
+  <div class="ins-card"><div class="ins-ico">🍔</div><div><div class="ins-t">Alimentação subiu em Março</div><div class="ins-s">+24% vs Janeiro. Considere cozinhar mais em casa.</div></div></div>
+  <div class="ins-card"><div class="ins-ico">💡</div><div><div class="ins-t">Assinaturas estáveis</div><div class="ins-s">R$ 72,90/mês. Revise se usa todos os serviços.</div></div></div>
+</div>
+
+<!-- DONUT -->
+<div class="card">
+  <div class="card-header">
+    <div><div class="card-title">Gastos por categoria</div><div class="card-sub" id="donut-sub">Março 2025</div></div>
+    <div class="mtabs" id="mtabs">
+      <div class="mtab on" onclick="setMonth(this,2)">Mar</div>
+      <div class="mtab" onclick="setMonth(this,1)">Fev</div>
+      <div class="mtab" onclick="setMonth(this,0)">Jan</div>
+    </div>
+  </div>
+  <div class="donut-wrap">
+    <div class="donut-c"><canvas id="donutChart"></canvas>
+      <div class="donut-mid"><div class="dm-val" id="dc-val">—</div><div class="dm-lbl">Total</div></div>
+    </div>
+    <div class="cat-list" id="cat-list"></div>
+  </div>
+</div>
+
+<!-- COMPARATIVO (DESBLOQUEADO) -->
+<div class="card">
+  <div class="card-header">
+    <div><div class="card-title">Comparativo por categoria — mês a mês</div><div class="card-sub">Jan, Fev e Mar de 2025</div></div>
+  </div>
+  <div class="comp-grid" id="comp-grid"></div>
+</div>
+
+<!-- METAS FINANCEIRAS (DESBLOQUEADAS) -->
+<div class="card">
+  <div class="card-header">
+    <div><div class="card-title">Metas financeiras</div><div class="card-sub">Progresso acumulado em 2025</div></div>
+  </div>
+  <div class="meta-list" id="meta-list"></div>
+</div>
+
+<!-- PROJEÇÃO (DESBLOQUEADA) -->
+<div class="card">
+  <div class="card-header">
+    <div><div class="card-title">Projeção dos próximos 3 meses</div><div class="card-sub">Baseada na média dos últimos 3 meses</div></div>
+  </div>
+  <div class="proj-row" id="proj-row"></div>
+</div>
+
+<!-- LINHA EVOLUÇÃO -->
+<div class="card">
+  <div class="card-header">
+    <div><div class="card-title">Evolução da economia mensal</div><div class="card-sub" id="line-sub">Ano completo · 2025</div></div>
+  </div>
+  <div style="position:relative;height:180px;"><canvas id="lineChart"></canvas></div>
+</div>
+
+<!-- HISTÓRICO ANUAL (DESBLOQUEADO) -->
+<div class="card">
+  <div class="card-header">
+    <div><div class="card-title">Histórico anual — 2024 vs 2025</div><div class="card-sub">Comparação dos 12 meses entre anos</div></div>
+  </div>
+  <div style="position:relative;height:200px;"><canvas id="histChart"></canvas></div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-title">Exportar relatório</div>
+    <div class="modal-sub">Escolha o formato. Todas as opções estão disponíveis para você.</div>
+    <div class="mopt" onclick="doExport('PDF')">
+      <div class="mopt-ico">📄</div>
+      <div class="mopt-text"><h4>PDF completo</h4><p>Relatório com gráficos e resumo executivo</p></div>
+      <div class="mopt-check"></div>
+    </div>
+    <div class="mopt" onclick="doExport('Excel')">
+      <div class="mopt-ico">📊</div>
+      <div class="mopt-text"><h4>Excel / CSV</h4><p>Todos os lançamentos em planilha</p></div>
+      <div class="mopt-check"></div>
+    </div>
+    <div class="mopt" onclick="doExport('E-mail')">
+      <div class="mopt-ico">📧</div>
+      <div class="mopt-text"><h4>Enviar por e-mail</h4><p>Receba o relatório mensalmente</p></div>
+      <div class="mopt-check"></div>
+    </div>
+    <div class="mopt" onclick="doExport('WhatsApp')">
+      <div class="mopt-ico">💬</div>
+      <div class="mopt-text"><h4>Compartilhar via WhatsApp</h4><p>Resumo rápido por mensagem</p></div>
+      <div class="mopt-check"></div>
+    </div>
+    <div class="toast-exp" id="toast-exp"></div>
+    <button class="mclose" onclick="closeModal()">Fechar</button>
+  </div>
+</div>
+
+<script>
+Chart.defaults.color='#6B7FA8';
+Chart.defaults.font.family='Inter';
+
+const MONTHS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MONTHS_FULL=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+const DATA={
+  2025:{
+    rec:[13000,12500,13000,12800,13200,12600,11800,12200,12700,13100,12900,14200],
+    gas:[2840,3060,3259,3100,3400,3150,2900,3000,3200,3350,3500,4100]
+  },
+  2024:{
+    rec:[12000,11500,12500,12000,13000,12500,11000,12000,12500,13000,12800,14000],
+    gas:[3200,3400,2900,3100,3500,3200,2800,3000,3100,3300,3600,4200]
+  }
+};
+
+const FILTERS={Q1:[0,1,2],Q2:[3,4,5],Q3:[6,7,8],Q4:[9,10,11],ALL:[0,1,2,3,4,5,6,7,8,9,10,11]};
+const FILTER_LABELS={Q1:'Janeiro a Março',Q2:'Abril a Junho',Q3:'Julho a Setembro',Q4:'Outubro a Dezembro',ALL:'Janeiro a Dezembro'};
+
+const CAT_DATA=[
+  [{n:'🍔 Alimentação',a:800,c:'#7C6FFF'},{n:'🚗 Transporte',a:500,c:'#12C98C'},{n:'🏠 Moradia',a:1200,c:'#FBBF24'},{n:'🎬 Lazer',a:200,c:'#F4547A'},{n:'📱 Assinaturas',a:140,c:'#94A3B8'}],
+  [{n:'🍔 Alimentação',a:750,c:'#7C6FFF'},{n:'🚗 Transporte',a:610,c:'#12C98C'},{n:'🏠 Moradia',a:1200,c:'#FBBF24'},{n:'🎬 Lazer',a:280,c:'#F4547A'},{n:'💊 Saúde',a:147,c:'#38BDF8'},{n:'📱 Assinaturas',a:73,c:'#94A3B8'}],
+  [{n:'🍔 Alimentação',a:980,c:'#7C6FFF'},{n:'🚗 Transporte',a:620,c:'#12C98C'},{n:'🏠 Moradia',a:1200,c:'#FBBF24'},{n:'🎬 Lazer',a:340,c:'#F4547A'},{n:'📱 Assinaturas',a:119,c:'#94A3B8'}]
+];
+
+let curYear=2025, curFilter='Q1', curMonth=2;
+let barC,donutC,lineC,histC;
+
+function fmt(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtK(v){return'R$ '+(v>=1000?(v/1000).toFixed(1)+'k':v);}
+
+/* ─── KPI ─── */
+function updateKPI(){
+  const idxs=FILTERS[curFilter], d=DATA[curYear];
+  const tr=idxs.reduce((s,i)=>s+(d.rec[i]||0),0);
+  const tg=idxs.reduce((s,i)=>s+(d.gas[i]||0),0);
+  const te=tr-tg, pct=tr>0?((te/tr)*100).toFixed(1):0;
+  document.getElementById('k-rec').textContent=fmt(tr);
+  document.getElementById('k-gas').textContent=fmt(tg);
+  document.getElementById('k-eco').textContent=fmt(te);
+  document.getElementById('k-rec-s').textContent=FILTER_LABELS[curFilter]+' · '+curYear;
+  document.getElementById('k-gas-s').textContent='↑ 8,3% vs período anterior';
+  document.getElementById('k-eco-s').textContent='↓ Taxa de '+pct+'% da renda';
+}
+
+/* ─── BAR CHART ─── */
+function buildBar(){
+  const ctx=document.getElementById('barChart').getContext('2d');
+  barC=new Chart(ctx,{
+    type:'bar',
+    data:{labels:[],datasets:[
+      {label:'Receitas',data:[],backgroundColor:'rgba(18,201,140,.72)',borderRadius:5,borderSkipped:false},
+      {label:'Despesas',data:[],backgroundColor:'rgba(244,84,122,.72)',borderRadius:5,borderSkipped:false},
+      {label:'Economia',data:[],backgroundColor:'rgba(124,111,255,.5)',borderRadius:5,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1C2740',borderColor:'rgba(255,255,255,.1)',borderWidth:1,titleColor:'#EEF2FF',bodyColor:'#B8C4E0',padding:10,
+        callbacks:{label:c=>' '+c.dataset.label+': '+fmt(c.raw||0)}}},
+      scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6B7FA8'}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6B7FA8',callback:v=>'R$ '+(v/1000).toFixed(0)+'k'}}}
+    }
+  });
+  updateBar();
+}
+function updateBar(){
+  const idxs=FILTERS[curFilter], d=DATA[curYear];
+  barC.data.labels=idxs.map(i=>MONTHS[i]);
+  barC.data.datasets[0].data=idxs.map(i=>d.rec[i]||0);
+  barC.data.datasets[1].data=idxs.map(i=>d.gas[i]||0);
+  barC.data.datasets[2].data=idxs.map((i,j)=>Math.max(0,(d.rec[i]||0)-(d.gas[i]||0)));
+  barC.update();
+  document.getElementById('bar-sub').textContent=FILTER_LABELS[curFilter]+' · '+curYear;
+}
+
+/* ─── DONUT ─── */
+function buildDonut(idx){
+  const cats=CAT_DATA[idx];
+  const vals=cats.map(c=>c.a), cols=cats.map(c=>c.c);
+  const total=vals.reduce((a,b)=>a+b,0);
+  if(donutC) donutC.destroy();
+  const ctx=document.getElementById('donutChart').getContext('2d');
+  donutC=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:cats.map(c=>c.n),datasets:[{data:vals,backgroundColor:cols,borderWidth:2,borderColor:'#141D2E',hoverOffset:5}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'66%',
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1C2740',borderColor:'rgba(255,255,255,.1)',borderWidth:1,titleColor:'#EEF2FF',bodyColor:'#B8C4E0',padding:10,
+        callbacks:{label:c=>' '+fmt(c.raw)}}}}
+  });
+  document.getElementById('dc-val').textContent='R$ '+total.toLocaleString('pt-BR');
+  document.getElementById('cat-list').innerHTML=cats.map(c=>`
+    <div class="cat-row">
+      <div class="cat-dot" style="background:${c.c};"></div>
+      <div class="cat-name">${c.n}</div>
+      <div class="cat-track"><div class="cat-fill" style="width:${Math.round(c.a/total*100)}%;background:${c.c};"></div></div>
+      <div class="cat-pct">${Math.round(c.a/total*100)}%</div>
+      <div class="cat-amt">${fmt(c.a)}</div>
+    </div>`).join('');
+}
+function setMonth(el,idx){
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  curMonth=idx;
+  document.getElementById('donut-sub').textContent=MONTHS_FULL[idx]+' 2025';
+  buildDonut(idx);
+}
+
+/* ─── COMPARATIVO ─── */
+function buildCompare(){
+  const cats=['🍔 Alimentação','🚗 Transporte','🏠 Moradia','🎬 Lazer','📱 Assinaturas'];
+  const vals=[
+    [800,750,980],[500,610,620],[1200,1200,1200],[200,280,340],[140,73,119]
+  ];
+  const colors=['#7C6FFF','#12C98C','#FBBF24','#F4547A','#94A3B8'];
+  const months=['Jan','Fev','Mar'];
+  document.getElementById('comp-grid').innerHTML=cats.map((cat,ci)=>{
+    const v=vals[ci];
+    const maxV=Math.max(...v);
+    const delta=v[2]-v[0];
+    const deltaPct=v[0]>0?((delta/v[0])*100).toFixed(0):0;
+    const cls=delta>0?'up':delta<0?'dn':'neu';
+    const sign=delta>0?'▲':delta<0?'▼':'=';
+    return`<div class="comp-card">
+      <div class="comp-card-title">${cat}<span class="comp-delta ${cls}">${sign} ${Math.abs(deltaPct)}%</span></div>
+      ${months.map((m,mi)=>`
+        <div class="comp-bar-row">
+          <div class="comp-bar-label"><span class="comp-bar-name">${m}</span><span class="comp-bar-val">R$ ${v[mi].toLocaleString('pt-BR')}</span></div>
+          <div class="comp-track"><div class="comp-fill" style="width:${Math.round(v[mi]/maxV*100)}%;background:${colors[ci]};opacity:${0.5+0.5*(mi/2)};"></div></div>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+/* ─── METAS ─── */
+function buildMetas(){
+  const metas=[
+    {ico:'🏖️',nome:'Viagem para o Nordeste',atual:1800,total:3000,cor:'#7C6FFF',prazo:'Jun/25'},
+    {ico:'🏠',nome:'Entrada do apartamento',atual:8500,total:20000,cor:'#12C98C',prazo:'Dez/26'},
+    {ico:'📱',nome:'iPhone novo',atual:900,total:1800,cor:'#FBBF24',prazo:'Mai/25'},
+    {ico:'🚗',nome:'Troca de carro',atual:4200,total:15000,cor:'#F4547A',prazo:'Jan/27'},
+  ];
+  document.getElementById('meta-list').innerHTML=metas.map(m=>{
+    const pct=Math.round(m.atual/m.total*100);
+    return`<div class="meta-item">
+      <div class="meta-header">
+        <div class="meta-name">${m.ico} ${m.nome}</div>
+        <div class="meta-vals">${fmt(m.atual)} / ${fmt(m.total)}</div>
+      </div>
+      <div class="meta-track"><div class="meta-fill" style="width:${pct}%;background:${m.cor};"></div></div>
+      <div class="meta-footer"><span>${pct}% concluído</span><span>Prazo: ${m.prazo}</span></div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── PROJEÇÃO ─── */
+function buildProj(){
+  const proj=[
+    {ico:'📅',mes:'Abril/25',rec:12900,gas:3180,hint:'Baseado na média de Jan–Mar'},
+    {ico:'📅',mes:'Maio/25',rec:13100,gas:3220,hint:'Tendência de crescimento'},
+    {ico:'📅',mes:'Junho/25',rec:13000,gas:3300,hint:'Pico esperado em lazer'},
+  ];
+  document.getElementById('proj-row').innerHTML=proj.map(p=>`
+    <div class="proj-card">
+      <div class="proj-emoji">${p.ico}</div>
+      <div class="proj-title">${p.mes}</div>
+      <div class="proj-val" style="color:var(--g);">${fmt(p.rec)}</div>
+      <div class="proj-val" style="color:var(--r);font-size:13px;">${fmt(p.gas)}</div>
+      <div class="proj-hint">${p.hint}</div>
+    </div>`).join('');
+}
+
+/* ─── LINE CHART ─── */
+function buildLine(){
+  const d=DATA[2025];
+  const eco=d.rec.map((r,i)=>Math.max(0,r-d.gas[i]));
+  const ctx=document.getElementById('lineChart').getContext('2d');
+  lineC=new Chart(ctx,{
+    type:'line',
+    data:{labels:MONTHS,datasets:[{label:'Economia',data:eco,borderColor:'#7C6FFF',backgroundColor:'rgba(124,111,255,.1)',pointBackgroundColor:'#7C6FFF',pointRadius:4,pointHoverRadius:6,fill:true,tension:.4,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1C2740',borderColor:'rgba(255,255,255,.1)',borderWidth:1,titleColor:'#EEF2FF',bodyColor:'#B8C4E0',padding:10,callbacks:{label:c=>' Economia: '+fmt(c.raw||0)}}},
+      scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6B7FA8'}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6B7FA8',callback:v=>'R$ '+(v/1000).toFixed(0)+'k'}}}}
+  });
+}
+
+/* ─── HIST CHART ─── */
+function buildHist(){
+  const d24=DATA[2024], d25=DATA[2025];
+  const ctx=document.getElementById('histChart').getContext('2d');
+  histC=new Chart(ctx,{
+    type:'bar',
+    data:{labels:MONTHS,datasets:[
+      {label:'Gastos 2025',data:d25.gas,backgroundColor:'rgba(244,84,122,.7)',borderRadius:4,borderSkipped:false},
+      {label:'Gastos 2024',data:d24.gas,backgroundColor:'rgba(148,163,184,.25)',borderRadius:4,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#B8C4E0',font:{size:12}}},tooltip:{backgroundColor:'#1C2740',borderColor:'rgba(255,255,255,.1)',borderWidth:1,titleColor:'#EEF2FF',bodyColor:'#B8C4E0',padding:10,callbacks:{label:c=>' '+c.dataset.label+': '+fmt(c.raw||0)}}},
+      scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6B7FA8'}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6B7FA8',callback:v=>'R$ '+(v/1000).toFixed(0)+'k'}}}}
+  });
+}
+
+/* ─── FILTER / YEAR ─── */
+function setFilter(el,key){
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  curFilter=key;
+  updateBar();
+  updateKPI();
+}
+function changeYear(d){
+  curYear=Math.max(2024,Math.min(2025,curYear+d));
+  document.getElementById('yr').textContent=curYear;
+  updateBar();
+  updateKPI();
+}
+
+/* ─── MODAL ─── */
+function openModal(){document.getElementById('modal').classList.add('show');}
+function closeModal(){document.getElementById('modal').classList.remove('show');document.getElementById('toast-exp').style.display='none';}
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+function doExport(tipo){
+  const t=document.getElementById('toast-exp');
+  t.textContent='✓ Exportando em '+tipo+'... Você receberá em instantes!';
+  t.style.display='block';
+  setTimeout(closeModal,2000);
+}
+
+/* ─── INIT ─── */
+buildBar();
+buildDonut(2);
+buildCompare();
+buildMetas();
+buildProj();
+buildLine();
+buildHist();
+updateKPI();
+</script>
+</body>
+</html>
