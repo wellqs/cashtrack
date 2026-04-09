@@ -1374,17 +1374,17 @@ function App() {
                 CashTrack
               </div>
               <h1 className="insp-wh1">
-                CashTrack - <span>Controle financeiro</span> sem complicacao.
+                CashTrack - <span>Controle financeiro</span> sem complicação.
               </h1>
               <p className="insp-wp">
-                Registro rapido, visual limpo e insights automaticos para voce nunca mais depender de planilhas.
+                Registro rápido, visual limpo e insights automáticos para você nunca mais depender de planilhas.
               </p>
               <div className="insp-wbtns">
                 <button className="insp-btnp" onClick={() => openAuth('signup')}>
-                  Criar conta gratis
+                  Criar conta grátis
                 </button>
                 <button className="insp-btng" onClick={() => openAuth('login')}>
-                  Ja tenho conta
+                  Já tenho conta
                 </button>
               </div>
             </div>
@@ -1392,17 +1392,17 @@ function App() {
             <div className="insp-fgrid">
               <div className="insp-fcard">
                 <div className="insp-ficon">{'\u26A1'}</div>
-                <h4>Registro ultrarrapido</h4>
-                <p>Digite "50 almoco" e o app interpreta valor, categoria e descricao automaticamente.</p>
+                <h4>Registro ultrarrápido</h4>
+                <p>Digite "50 almoço" e o app interpreta valor, categoria e descrição automaticamente.</p>
               </div>
               <div className="insp-fcard">
                 <div className="insp-ficon">{'\uD83D\uDCCA'}</div>
                 <h4>Dashboard inteligente</h4>
-                <p>Saldo, categorias e tendencias num relance com visual claro.</p>
+                <p>Saldo, categorias e tendências num relance com visual claro.</p>
               </div>
               <div className="insp-fcard">
                 <div className="insp-ficon">{'\uD83D\uDCA1'}</div>
-                <h4>Insights automaticos</h4>
+                <h4>Insights automáticos</h4>
                 <p>Descubra oportunidades de economia sem precisar procurar.</p>
               </div>
             </div>
