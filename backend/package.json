@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "cashtrack-backend",
   "version": "1.0.0",
   "private": true,
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^9.6.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^4.21.2",

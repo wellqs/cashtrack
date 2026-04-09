@@ -1,4 +1,4 @@
-﻿import express from 'express'
+import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser'
 import { v4 as uuid } from 'uuid'
 import { z } from 'zod'
 
-import { loadDb, saveDb, seedBaseCategoriesForUser } from './db.js'
+import { db, mapCategory, mapUser, seedBaseCategoriesForUser } from './db.js'
 import { clearAuthCookie, requireAuth, setAuthCookie, signToken } from './auth.js'
 import { isIsoDateString, parseIsoDateParts, quarterMonths, sanitizeText } from './utils.js'
 
@@ -67,6 +67,8 @@ app.get('/', (_, res) => {
   })
 })
 
+// ─── Auth ────────────────────────────────────────────────────────────────────
+
 const registerSchema = z.object({
   email: z.string().trim().email().max(120),
   password: z.string().min(6).max(72),
@@ -77,9 +79,8 @@ app.post('/api/auth/register', authRateLimiter, async (req, res) => {
   const parsed = registerSchema.safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ message: 'Dados invalidos' })
 
-  const db = loadDb()
   const email = parsed.data.email.toLowerCase()
-  const exists = db.users.some((u) => u.email === email)
+  const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(email)
   if (exists) return res.status(409).json({ message: 'Email ja cadastrado' })
 
   const user = {
@@ -90,31 +91,35 @@ app.post('/api/auth/register', authRateLimiter, async (req, res) => {
     plan: 'free',
     monthlyIncome: 0,
     targetSave: 0,
-    notifyLimit: true,
-    weeklySummary: false,
+    notifyLimit: 1,
+    weeklySummary: 0,
     goal: 'Controlar meus gastos',
     createdAt: new Date().toISOString()
   }
 
-  db.users.push(user)
-  seedBaseCategoriesForUser(db, user.id)
-  saveDb(db)
+  db.prepare(`
+    INSERT INTO users (id, email, passwordHash, displayName, plan, monthlyIncome, targetSave, notifyLimit, weeklySummary, goal, createdAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(user.id, user.email, user.passwordHash, user.displayName, user.plan,
+    user.monthlyIncome, user.targetSave, user.notifyLimit, user.weeklySummary, user.goal, user.createdAt)
+
+  seedBaseCategoriesForUser(user.id)
 
   const token = signToken({ uid: user.id, email: user.email })
   setAuthCookie(res, token)
-  return res.status(201).json({ user: { ...user, passwordHash: undefined } })
+  return res.status(201).json({ user: mapUser(user) })
 })
 
 const loginSchema = z.object({
   email: z.string().trim().email().max(120),
   password: z.string().min(1).max(72)
 }).strict()
+
 app.post('/api/auth/login', authRateLimiter, async (req, res) => {
   const parsed = loginSchema.safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ message: 'Dados invalidos' })
 
-  const db = loadDb()
-  const user = db.users.find((u) => u.email === parsed.data.email.toLowerCase())
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(parsed.data.email.toLowerCase())
   if (!user) return res.status(401).json({ message: 'Credenciais invalidas' })
 
   const ok = await bcrypt.compare(parsed.data.password, user.passwordHash)
@@ -122,7 +127,7 @@ app.post('/api/auth/login', authRateLimiter, async (req, res) => {
 
   const token = signToken({ uid: user.id, email: user.email })
   setAuthCookie(res, token)
-  return res.json({ user: { ...user, passwordHash: undefined } })
+  return res.json({ user: mapUser(user) })
 })
 
 app.post('/api/auth/logout', (req, res) => {
@@ -130,11 +135,12 @@ app.post('/api/auth/logout', (req, res) => {
   return res.status(204).send()
 })
 
+// ─── Perfil ───────────────────────────────────────────────────────────────────
+
 app.get('/api/me', requireAuth, (req, res) => {
-  const db = loadDb()
-  const user = db.users.find((u) => u.id === req.user.uid)
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.uid)
   if (!user) return res.status(404).json({ message: 'Usuario nao encontrado' })
-  return res.json({ user: { ...user, passwordHash: undefined } })
+  return res.json({ user: mapUser(user) })
 })
 
 const profileSchema = z.object({
@@ -150,13 +156,27 @@ app.put('/api/me/profile', requireAuth, writeRateLimiter, (req, res) => {
   const parsed = profileSchema.safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ message: 'Dados invalidos' })
 
-  const db = loadDb()
-  const index = db.users.findIndex((u) => u.id === req.user.uid)
-  if (index < 0) return res.status(404).json({ message: 'Usuario nao encontrado' })
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.uid)
+  if (!user) return res.status(404).json({ message: 'Usuario nao encontrado' })
 
-  db.users[index] = { ...db.users[index], ...parsed.data }
-  saveDb(db)
-  return res.json({ user: { ...db.users[index], passwordHash: undefined } })
+  const data = parsed.data
+  const updates = []
+  const values = []
+
+  if (data.displayName !== undefined) { updates.push('displayName = ?'); values.push(data.displayName) }
+  if (data.monthlyIncome !== undefined) { updates.push('monthlyIncome = ?'); values.push(data.monthlyIncome) }
+  if (data.targetSave !== undefined) { updates.push('targetSave = ?'); values.push(data.targetSave) }
+  if (data.notifyLimit !== undefined) { updates.push('notifyLimit = ?'); values.push(data.notifyLimit ? 1 : 0) }
+  if (data.weeklySummary !== undefined) { updates.push('weeklySummary = ?'); values.push(data.weeklySummary ? 1 : 0) }
+  if (data.goal !== undefined) { updates.push('goal = ?'); values.push(data.goal) }
+
+  if (updates.length > 0) {
+    values.push(req.user.uid)
+    db.prepare(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`).run(...values)
+  }
+
+  const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.uid)
+  return res.json({ user: mapUser(updated) })
 })
 
 const passwordSchema = z.object({
@@ -168,49 +188,47 @@ app.put('/api/me/password', requireAuth, authRateLimiter, async (req, res) => {
   const parsed = passwordSchema.safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ message: 'Dados invalidos' })
 
-  const db = loadDb()
-  const index = db.users.findIndex((u) => u.id === req.user.uid)
-  if (index < 0) return res.status(404).json({ message: 'Usuario nao encontrado' })
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.uid)
+  if (!user) return res.status(404).json({ message: 'Usuario nao encontrado' })
 
-  const matches = await bcrypt.compare(parsed.data.currentPassword, db.users[index].passwordHash)
+  const matches = await bcrypt.compare(parsed.data.currentPassword, user.passwordHash)
   if (!matches) return res.status(401).json({ message: 'Senha atual incorreta' })
 
-  db.users[index].passwordHash = await bcrypt.hash(parsed.data.newPassword, 10)
-  saveDb(db)
+  const newHash = await bcrypt.hash(parsed.data.newPassword, 10)
+  db.prepare('UPDATE users SET passwordHash = ? WHERE id = ?').run(newHash, req.user.uid)
   return res.json({ ok: true })
 })
 
 app.get('/api/me/export', requireAuth, (req, res) => {
-  const db = loadDb()
-  const user = db.users.find((u) => u.id === req.user.uid)
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.uid)
   if (!user) return res.status(404).json({ message: 'Usuario nao encontrado' })
 
-  const categories = db.categories.filter((c) => c.userId === req.user.uid)
-  const transactions = db.transactions.filter((t) => t.userId === req.user.uid)
+  const categories = db.prepare('SELECT * FROM categories WHERE userId = ?').all(req.user.uid).map(mapCategory)
+  const transactions = db.prepare('SELECT * FROM transactions WHERE userId = ?').all(req.user.uid)
 
   return res.json({
     exportedAt: new Date().toISOString(),
-    user: { ...user, passwordHash: undefined },
+    user: mapUser(user),
     categories,
     transactions
   })
 })
 
 app.delete('/api/me', requireAuth, authRateLimiter, (req, res) => {
-  const db = loadDb()
-  const exists = db.users.some((u) => u.id === req.user.uid)
-  if (!exists) return res.status(404).json({ message: 'Usuario nao encontrado' })
+  const user = db.prepare('SELECT id FROM users WHERE id = ?').get(req.user.uid)
+  if (!user) return res.status(404).json({ message: 'Usuario nao encontrado' })
 
-  db.users = db.users.filter((u) => u.id !== req.user.uid)
-  db.categories = db.categories.filter((c) => c.userId !== req.user.uid)
-  db.transactions = db.transactions.filter((t) => t.userId !== req.user.uid)
-  saveDb(db)
+  db.prepare('DELETE FROM transactions WHERE userId = ?').run(req.user.uid)
+  db.prepare('DELETE FROM categories WHERE userId = ?').run(req.user.uid)
+  db.prepare('DELETE FROM users WHERE id = ?').run(req.user.uid)
+  clearAuthCookie(res)
   return res.status(204).send()
 })
 
+// ─── Categorias ───────────────────────────────────────────────────────────────
+
 app.get('/api/categories', requireAuth, (req, res) => {
-  const db = loadDb()
-  const categories = db.categories.filter((c) => c.userId === req.user.uid)
+  const categories = db.prepare('SELECT * FROM categories WHERE userId = ?').all(req.user.uid).map(mapCategory)
   res.json({ categories })
 })
 
@@ -224,10 +242,9 @@ app.post('/api/categories', requireAuth, writeRateLimiter, (req, res) => {
   const parsed = categorySchema.safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ message: 'Dados invalidos' })
 
-  const db = loadDb()
-  const duplicated = db.categories.some(
-    (c) => c.userId === req.user.uid && c.type === parsed.data.type && c.name.toLowerCase() === parsed.data.name.toLowerCase()
-  )
+  const duplicated = db.prepare(
+    'SELECT id FROM categories WHERE userId = ? AND type = ? AND LOWER(name) = LOWER(?)'
+  ).get(req.user.uid, parsed.data.type, parsed.data.name)
   if (duplicated) return res.status(409).json({ message: 'Categoria ja existe' })
 
   const category = {
@@ -236,38 +253,60 @@ app.post('/api/categories', requireAuth, writeRateLimiter, (req, res) => {
     name: parsed.data.name,
     type: parsed.data.type,
     icon: parsed.data.icon,
-    predefined: false,
+    predefined: 0,
     createdAt: new Date().toISOString()
   }
 
-  db.categories.push(category)
-  saveDb(db)
-  return res.status(201).json({ category })
+  db.prepare('INSERT INTO categories (id, userId, name, type, icon, predefined, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)').run(
+    category.id, category.userId, category.name, category.type, category.icon, category.predefined, category.createdAt
+  )
+  return res.status(201).json({ category: mapCategory(category) })
 })
 
 app.put('/api/categories/:id', requireAuth, writeRateLimiter, (req, res) => {
   const parsed = categorySchema.partial().safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ message: 'Dados invalidos' })
 
-  const db = loadDb()
-  const index = db.categories.findIndex((c) => c.id === req.params.id && c.userId === req.user.uid)
-  if (index < 0) return res.status(404).json({ message: 'Categoria nao encontrada' })
-  if (db.categories[index].predefined) return res.status(403).json({ message: 'Categoria base nao pode ser editada' })
+  const category = db.prepare('SELECT * FROM categories WHERE id = ? AND userId = ?').get(req.params.id, req.user.uid)
+  if (!category) return res.status(404).json({ message: 'Categoria nao encontrada' })
+  if (category.predefined) return res.status(403).json({ message: 'Categoria base nao pode ser editada' })
 
-  db.categories[index] = { ...db.categories[index], ...parsed.data }
-  saveDb(db)
-  return res.json({ category: db.categories[index] })
+  const data = parsed.data
+  const updates = []
+  const values = []
+  if (data.name !== undefined) { updates.push('name = ?'); values.push(data.name) }
+  if (data.type !== undefined) { updates.push('type = ?'); values.push(data.type) }
+  if (data.icon !== undefined) { updates.push('icon = ?'); values.push(data.icon) }
+
+  if (updates.length > 0) {
+    values.push(req.params.id)
+    db.prepare(`UPDATE categories SET ${updates.join(', ')} WHERE id = ?`).run(...values)
+  }
+
+  const updated = db.prepare('SELECT * FROM categories WHERE id = ?').get(req.params.id)
+  return res.json({ category: mapCategory(updated) })
 })
 
 app.delete('/api/categories/:id', requireAuth, writeRateLimiter, (req, res) => {
-  const db = loadDb()
-  const category = db.categories.find((c) => c.id === req.params.id && c.userId === req.user.uid)
+  const category = db.prepare('SELECT * FROM categories WHERE id = ? AND userId = ?').get(req.params.id, req.user.uid)
   if (!category) return res.status(404).json({ message: 'Categoria nao encontrada' })
   if (category.predefined) return res.status(403).json({ message: 'Categoria base nao pode ser excluida' })
 
-  db.categories = db.categories.filter((c) => c.id !== req.params.id)
-  saveDb(db)
+  db.prepare('DELETE FROM categories WHERE id = ?').run(req.params.id)
   return res.status(204).send()
+})
+
+// ─── Transações ───────────────────────────────────────────────────────────────
+
+app.get('/api/transactions', requireAuth, (req, res) => {
+  const transactions = db.prepare(`
+    SELECT t.*, c.name AS categoryName, c.icon AS categoryIcon
+    FROM transactions t
+    LEFT JOIN categories c ON t.categoryId = c.id
+    WHERE t.userId = ?
+    ORDER BY t.date DESC, t.createdAt DESC
+  `).all(req.user.uid)
+  res.json({ transactions })
 })
 
 const transactionSchema = z.object({
@@ -281,35 +320,33 @@ const transactionSchema = z.object({
   note: z.string().trim().max(240).optional()
 }).strict()
 
-app.get('/api/transactions', requireAuth, (req, res) => {
-  const db = loadDb()
-  const categories = db.categories.filter((c) => c.userId === req.user.uid)
-  const tx = db.transactions
-    .filter((t) => t.userId === req.user.uid)
-    .map((t) => {
-      const category = categories.find((c) => c.id === t.categoryId)
-      return { ...t, categoryName: category?.name || 'Sem categoria', categoryIcon: category?.icon || '•' }
-    })
-    .sort((a, b) => String(b.date).localeCompare(String(a.date)))
-  res.json({ transactions: tx })
-})
-
 app.post('/api/transactions', requireAuth, writeRateLimiter, (req, res) => {
   const parsed = transactionSchema.safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ message: 'Dados invalidos' })
 
-  const db = loadDb()
-  const category = db.categories.find((c) => c.id === parsed.data.categoryId && c.userId === req.user.uid)
+  const category = db.prepare('SELECT id FROM categories WHERE id = ? AND userId = ?').get(parsed.data.categoryId, req.user.uid)
   if (!category) return res.status(404).json({ message: 'Categoria nao encontrada' })
 
   const tx = {
     id: uuid(),
     userId: req.user.uid,
-    ...parsed.data,
+    type: parsed.data.type,
+    amount: parsed.data.amount,
+    description: parsed.data.description,
+    categoryId: parsed.data.categoryId,
+    date: parsed.data.date,
+    account: parsed.data.account || 'Conta corrente',
+    recurrence: parsed.data.recurrence || null,
+    note: parsed.data.note || null,
     createdAt: new Date().toISOString()
   }
-  db.transactions.push(tx)
-  saveDb(db)
+
+  db.prepare(`
+    INSERT INTO transactions (id, userId, type, amount, description, categoryId, date, account, recurrence, note, createdAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(tx.id, tx.userId, tx.type, tx.amount, tx.description, tx.categoryId, tx.date,
+    tx.account, tx.recurrence, tx.note, tx.createdAt)
+
   return res.status(201).json({ transaction: tx })
 })
 
@@ -317,33 +354,50 @@ app.put('/api/transactions/:id', requireAuth, writeRateLimiter, (req, res) => {
   const parsed = transactionSchema.partial().safeParse(req.body)
   if (!parsed.success) return res.status(400).json({ message: 'Dados invalidos' })
 
-  const db = loadDb()
-  const index = db.transactions.findIndex((t) => t.id === req.params.id && t.userId === req.user.uid)
-  if (index < 0) return res.status(404).json({ message: 'Transacao nao encontrada' })
+  const tx = db.prepare('SELECT * FROM transactions WHERE id = ? AND userId = ?').get(req.params.id, req.user.uid)
+  if (!tx) return res.status(404).json({ message: 'Transacao nao encontrada' })
 
-  db.transactions[index] = { ...db.transactions[index], ...parsed.data }
-  saveDb(db)
-  return res.json({ transaction: db.transactions[index] })
+  const data = parsed.data
+  const updates = []
+  const values = []
+  const fields = ['type', 'amount', 'description', 'categoryId', 'date', 'account', 'recurrence', 'note']
+  for (const field of fields) {
+    if (data[field] !== undefined) {
+      updates.push(`${field} = ?`)
+      values.push(data[field])
+    }
+  }
+
+  if (updates.length > 0) {
+    values.push(req.params.id)
+    db.prepare(`UPDATE transactions SET ${updates.join(', ')} WHERE id = ?`).run(...values)
+  }
+
+  const updated = db.prepare('SELECT * FROM transactions WHERE id = ?').get(req.params.id)
+  return res.json({ transaction: updated })
 })
 
 app.delete('/api/transactions/:id', requireAuth, writeRateLimiter, (req, res) => {
-  const db = loadDb()
-  const exists = db.transactions.some((t) => t.id === req.params.id && t.userId === req.user.uid)
-  if (!exists) return res.status(404).json({ message: 'Transacao nao encontrada' })
+  const tx = db.prepare('SELECT id FROM transactions WHERE id = ? AND userId = ?').get(req.params.id, req.user.uid)
+  if (!tx) return res.status(404).json({ message: 'Transacao nao encontrada' })
 
-  db.transactions = db.transactions.filter((t) => !(t.id === req.params.id && t.userId === req.user.uid))
-  saveDb(db)
+  db.prepare('DELETE FROM transactions WHERE id = ?').run(req.params.id)
   return res.status(204).send()
 })
 
+// ─── Dashboard e Relatórios ───────────────────────────────────────────────────
+
 app.get('/api/dashboard/summary', requireAuth, (req, res) => {
   const month = String(req.query.month || '')
-  const db = loadDb()
-  let tx = db.transactions.filter((t) => t.userId === req.user.uid)
 
+  let query = 'SELECT * FROM transactions WHERE userId = ?'
+  const params = [req.user.uid]
   if (month) {
-    tx = tx.filter((t) => String(t.date).startsWith(month))
+    query += ' AND date LIKE ?'
+    params.push(`${month}%`)
   }
+
+  const tx = db.prepare(query).all(...params)
 
   const income = tx.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0)
   const expense = tx.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
@@ -355,26 +409,19 @@ app.get('/api/dashboard/summary', requireAuth, (req, res) => {
       return acc
     }, {})
 
-  return res.json({
-    month,
-    income,
-    expense,
-    balance: income - expense,
-    expenseByCategory
-  })
+  return res.json({ month, income, expense, balance: income - expense, expenseByCategory })
 })
 
 app.get('/api/reports/overview', requireAuth, (req, res) => {
   const year = Number(req.query.year || new Date().getUTCFullYear())
   const period = String(req.query.period || 'ALL')
   const months = quarterMonths(period)
-  const db = loadDb()
-  const tx = db.transactions.filter((t) => {
-    if (t.userId !== req.user.uid) return false
-    const parts = parseIsoDateParts(t.date)
-    if (!parts) return false
-    return parts.year === year && months.includes(parts.month)
-  })
+
+  const tx = db.prepare('SELECT * FROM transactions WHERE userId = ? AND date LIKE ?').all(req.user.uid, `${year}-%`)
+    .filter((t) => {
+      const parts = parseIsoDateParts(t.date)
+      return parts && months.includes(parts.month)
+    })
 
   const totals = tx.reduce(
     (acc, t) => {
