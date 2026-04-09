@@ -5,7 +5,9 @@ services:
       context: ./frontend
       target: prod
       args:
-        VITE_API_URL: ${VITE_API_URL}
+        # URL relativa: o browser chama o mesmo host/porta que carregou o frontend
+        # O nginx proxia /api para o backend internamente — funciona com qualquer IP ou domínio
+        VITE_API_URL: /api
     ports:
       - "80:80"
     depends_on:
