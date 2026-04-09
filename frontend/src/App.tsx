@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import { CATEGORY_PRESETS, ICON_LIBRARY, type CategoryType, getCategoryIcon } from './icons/categoryIcons'
 import './App.css'
 
@@ -413,6 +413,8 @@ function App() {
   const [hoveredWeekDay, setHoveredWeekDay] = useState<string | null>(null)
   const [hoveredReportMonth, setHoveredReportMonth] = useState<number | null>(null)
   const [hoveredReportCategory, setHoveredReportCategory] = useState<string | null>(null)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement | null>(null)
 
   const parsedQuick = useMemo(() => parseQuickInput(quickInput), [quickInput])
   const now = new Date()
@@ -902,6 +904,27 @@ function App() {
       setTransactionMonthFilter(currentMonthKey)
     }
   }, [transactionMonthFilter, transactionMonthOptions, currentMonthKey])
+
+  useEffect(() => {
+    function handlePointerDown(event: MouseEvent) {
+      if (!isUserMenuOpen) return
+      const target = event.target as Node | null
+      if (userMenuRef.current && target && !userMenuRef.current.contains(target)) {
+        setIsUserMenuOpen(false)
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') setIsUserMenuOpen(false)
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isUserMenuOpen])
 
   function hydrateUserFromApi(user: ApiUser) {
     setDisplayName(user.displayName || '')
@@ -1553,12 +1576,12 @@ function App() {
         <div className="insp-app">
           <div className="insp-shell">
             <aside className={`insp-sb ${sidebarCollapsed ? 'col' : ''}`}>
-              <div className="insp-logo">
+              <button className="insp-logo insp-logo-btn" type="button" onClick={() => setActivePage('dashboard')}>
                 <div className="insp-mark">CT</div>
                 <div className="insp-word">
                   Cash<span>Track</span>
                 </div>
-              </div>
+              </button>
 
               <nav className="insp-nav">
                 {!sidebarCollapsed && <p className="insp-navcap">Principal</p>}
@@ -1605,7 +1628,42 @@ function App() {
                 <div className="insp-tright">
                   <input className="insp-search" placeholder="Buscar..." />
                   <div className="insp-meta">{getCurrentMonthYearLabel()}</div>
-                  <div className="insp-user">{profileInitials || 'CT'}</div>
+                  <div className="insp-user-menu" ref={userMenuRef}>
+                    <button
+                      type="button"
+                      className="insp-user insp-user-btn"
+                      aria-expanded={isUserMenuOpen}
+                      aria-haspopup="menu"
+                      onClick={() => setIsUserMenuOpen((value) => !value)}
+                    >
+                      {profileInitials || 'CT'}
+                    </button>
+                    {isUserMenuOpen && (
+                      <div className="insp-user-dropdown" role="menu" aria-label="Menu do perfil">
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            setActivePage('profile')
+                            openProfilePanel('edit')
+                            setIsUserMenuOpen(false)
+                          }}
+                        >
+                          Editar perfil
+                        </button>
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            setIsUserMenuOpen(false)
+                            logoutUser()
+                          }}
+                        >
+                          Sair da conta
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </header>
 
@@ -2675,7 +2733,5 @@ function App() {
 }
 
 export default App
-
-
 
 

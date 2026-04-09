@@ -456,6 +456,24 @@
   border-bottom: 1px solid var(--border);
 }
 
+.insp-logo-btn {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.insp-logo-btn:hover {
+  background: rgba(124, 111, 255, 0.1);
+}
+
+.insp-logo-btn:focus-visible {
+  outline: 2px solid rgba(124, 111, 255, 0.85);
+  outline-offset: -2px;
+}
+
 .insp-mark {
   width: 34px;
   height: 34px;
@@ -665,6 +683,46 @@
   justify-content: center;
   font-size: 11px;
   font-weight: 700;
+}
+
+.insp-user-menu {
+  position: relative;
+}
+
+.insp-user-btn {
+  border: 0;
+  cursor: pointer;
+}
+
+.insp-user-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 156px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #121d33;
+  box-shadow: 0 16px 32px rgba(4, 10, 22, 0.45);
+  padding: 6px;
+  display: grid;
+  gap: 4px;
+  z-index: 50;
+}
+
+.insp-user-dropdown button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: #d5e1ff;
+  border-radius: 8px;
+  padding: 8px 9px;
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.insp-user-dropdown button:hover {
+  border-color: rgba(124, 111, 255, 0.42);
+  background: rgba(124, 111, 255, 0.18);
 }
 
 .dash-hero {

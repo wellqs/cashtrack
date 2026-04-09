@@ -1,4 +1,4 @@
-﻿services:
+services:
   cashtrack-frontend:
     container_name: cashtrack-frontend
     build:
@@ -23,8 +23,10 @@
     volumes:
       - ./backend:/app
       - /app/node_modules
-    environment:
-      - PORT=3333
-      - JWT_SECRET=cashtrack-super-secret
-      - FRONTEND_ORIGIN=http://localhost:5174
+      - cashtrack-data:/app/data
+    env_file:
+      - ./backend/.env
     restart: unless-stopped
+
+volumes:
+  cashtrack-data:
