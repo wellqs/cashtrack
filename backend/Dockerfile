@@ -13,7 +13,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY src ./src
 COPY package*.json ./
-RUN addgroup -S cashtrack && adduser -S cashtrack -G cashtrack
+RUN addgroup -S cashtrack && adduser -S cashtrack -G cashtrack \
+    && mkdir -p /app/data && chown -R cashtrack:cashtrack /app/data
 USER cashtrack
 EXPOSE 3333
 CMD ["node", "src/server.js"]
