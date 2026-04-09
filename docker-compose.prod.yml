@@ -1,0 +1,33 @@
+services:
+  cashtrack-frontend:
+    container_name: cashtrack-frontend
+    build:
+      context: ./frontend
+      target: prod
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    ports:
+      - "80:80"
+    depends_on:
+      cashtrack-backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  cashtrack-backend:
+    container_name: cashtrack-backend
+    build:
+      context: ./backend
+    volumes:
+      - cashtrack-data:/app/data
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3333/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  cashtrack-data:
