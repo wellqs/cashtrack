@@ -6,7 +6,8 @@ if (JWT_SECRET.length < 16) {
 }
 
 export const AUTH_COOKIE_NAME = 'cashtrack_session'
-const IS_PRODUCTION = process.env.NODE_ENV === 'production'
+// COOKIE_SECURE=true apenas quando o site rodar com HTTPS
+const COOKIE_SECURE = process.env.COOKIE_SECURE === 'true'
 
 export function signToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' })
@@ -15,7 +16,7 @@ export function signToken(payload) {
 export function setAuthCookie(res, token) {
   res.cookie(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: IS_PRODUCTION,
+    secure: COOKIE_SECURE,
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/',
@@ -25,7 +26,7 @@ export function setAuthCookie(res, token) {
 export function clearAuthCookie(res) {
   res.clearCookie(AUTH_COOKIE_NAME, {
     httpOnly: true,
-    secure: IS_PRODUCTION,
+    secure: COOKIE_SECURE,
     sameSite: 'lax',
     path: '/',
   })
