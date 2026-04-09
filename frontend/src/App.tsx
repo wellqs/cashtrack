@@ -562,8 +562,11 @@ function App() {
   const monthlyIncomeNumber = parseCurrencyInputToNumber(monthlyIncome)
   const targetSaveNumber = parseCurrencyInputToNumber(targetSave)
   const expenseRate = monthlyIncomeNumber > 0 ? (expenseTotal / monthlyIncomeNumber) * 100 : 0
-  const activeSubscriptions = categories.filter((c) => normalizeText(c.name).includes('assin')).length
-  const travelGoalMonths = balance > 0 ? Math.max(1, Math.ceil((Number(targetSave || '1000') || 1000) / balance)) : 0
+  const subscriptionCategoryIds = new Set(
+    categories.filter((c) => normalizeText(c.name).includes('assin')).map((c) => c.id)
+  )
+  const activeSubscriptions = transactions.filter((t) => t.categoryId && subscriptionCategoryIds.has(t.categoryId)).length
+  const travelGoalMonths = balance > 0 && targetSaveNumber > 0 ? Math.max(1, Math.ceil(targetSaveNumber / balance)) : 0
   const hasProfileInputs = monthlyIncomeNumber > 0 || targetSaveNumber > 0 || transactions.length > 0
   const budgetHealthTip = (() => {
     if (monthlyIncomeNumber <= 0) {
@@ -706,8 +709,11 @@ function App() {
     }
     return { dot: 'green', title: 'Resumo semanal ativo.', text: 'Otimo para manter disciplina e detectar desvios cedo.' }
   })()
+  const dotPriority: Record<string, number> = { pink: 0, amber: 1, violet: 2, green: 3 }
   const personalizedTips = hasProfileInputs
-    ? [foodTip, budgetHealthTip, goalTip, consistencyTip, subscriptionTip, alertTip].slice(0, 4)
+    ? [budgetHealthTip, foodTip, goalTip, subscriptionTip, alertTip, consistencyTip]
+        .sort((a, b) => (dotPriority[a.dot] ?? 4) - (dotPriority[b.dot] ?? 4))
+        .slice(0, 4)
     : []
   const isAddDateCurrentMonth = addDate.startsWith(currentMonthKey)
   const addDateMonthLabel = getMonthYearLabelFromInputDate(addDate)
